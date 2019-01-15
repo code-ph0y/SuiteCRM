@@ -64,7 +64,11 @@
       ],
       "SuiteCRM\\Modules\\": [
         "modules/"
+      ],
+      "SuiteCRM\\Cli\\": [
+        "modules/Administration/cli"
       ]
+
     },
     "classmap": [
       "Api/"
