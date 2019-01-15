@@ -39,7 +39,7 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-namespace SuiteCRM\Cli;
+namespace SuiteCRM\Cli\Repair;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -50,10 +50,10 @@ if (!defined('sugarEntry')) {
     define('sugarEntry', true);
 }
 
-class QuickRepairCommand extends SuiteCommand
+class QuickRepairRebuildCommand extends SuiteCommand
 {
     // The name of the command
-    protected static $defaultName = 'admin:quick-repair';
+    protected static $defaultName = 'admin:repair:quick-repair-rebuild';
 
     public function __construct()
     {

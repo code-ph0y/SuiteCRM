@@ -39,7 +39,7 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-namespace SuiteCRM\Cli;
+namespace SuiteCRM\Cli\Repair;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -53,7 +53,7 @@ if (!defined('sugarEntry')) {
 class RepairRolesCommand extends SuiteCommand
 {
     // The name of the command
-    protected static $defaultName = 'admin:repair:rebuild-htaccess-file';
+    protected static $defaultName = 'admin:repair:repair-roles';
 
     public function __construct()
     {
@@ -69,16 +69,16 @@ class RepairRolesCommand extends SuiteCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Run Rebuild .htaccess File')
+            ->setDescription('Run Repair Roles')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('Rebuilds .htaccess to limit access to certain files directly.')
+            ->setHelp('Repairs Roles by adding all new modules that support Access Controls, and by adding any new Access Controls to existing modules.')
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
-        // Run rebuild-htaccess-file
+        // Run repair-roles
     }
 
 }
