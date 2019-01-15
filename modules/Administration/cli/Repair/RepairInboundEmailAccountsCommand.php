@@ -50,10 +50,10 @@ if (!defined('sugarEntry')) {
     define('sugarEntry', true);
 }
 
-class QuickRepairCommand extends SuiteCommand
+class RepairInboundEmailAccountsCommand extends SuiteCommand
 {
     // The name of the command
-    protected static $defaultName = 'admin:quick-repair';
+    protected static $defaultName = 'admin:repair:repair-inbound-email-accounts';
 
     public function __construct()
     {
@@ -69,29 +69,16 @@ class QuickRepairCommand extends SuiteCommand
     {
         $this
             // the short description shown while running "php bin/console list"
-            ->setDescription('Run Quick Repair and Rebuild')
+            ->setDescription('Run Repair Inbound Email Accounts')
 
             // the full command description shown when running the command with
             // the "--help" option
-            ->setHelp('This command allows you to run the repair and rebuild')
+            ->setHelp('Repairs Inbound Email accounts and encrypts account passwords.')
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output) {
-        $repair = new \RepairAndClear();
-
-        $repair->repairAndClearAll(
-            array('clearAll'),
-            array(translate('LBL_ALL_MODULES')),
-            true,
-            false
-        );
-
-        //remove the js language files
-        \LanguageManager::removeJSLanguageFiles();
-
-        //remove language cache files
-        \LanguageManager::clearLanguageCache();
+        // Run repair-inbound-email-accounts
     }
 
 }
