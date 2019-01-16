@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/../vendor/autoload.php';
+
+use Symfony\Component\Console\Application;
+
+$application = new Application('SuiteCRM Command Line');
+
+$command_path = __DIR__ . '/../modules/*/cli/*/*Command.php';
+
+$iterator = new GlobIterator($command_path, FilesystemIterator::KEY_AS_FILENAME);
+
+foreach ($iterator as $item) {
+    $className = "SuiteCRM\\Cli\\Repair\\" . rtrim(basename($item->getFilename()), ".php");
+
+    $command = new $className();
+
+    $application->add($command);
+}
+
+// Run Console Application
+$application->run();
