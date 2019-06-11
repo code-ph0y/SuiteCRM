@@ -160,10 +160,11 @@ function insert_variable_html(text) {
 
 }
 
-function insert_variable_html_link(text, url) {
-	var thelink = "<a href='" +url + "' > "+text+" </a>";
+function insert_variable_html_link(text,url) {
+	var thelink='<a href="'+url+'" > '+text+' </a>';
 	insert_variable_html(thelink);
 }
+
 /*
  * this function will check to see if text only flag has been checked.
  * If so, the it will call the text insert function, if not, then it
