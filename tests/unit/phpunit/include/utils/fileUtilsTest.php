@@ -1,7 +1,5 @@
 <?php
 
-use org\bovigo\vfs\vfsStream;
-
 require_once 'include/utils/file_utils.php';
 class file_utilsTest extends SuiteCRM\StateCheckerPHPUnitTestCaseAbstract
 {
@@ -296,7 +294,7 @@ class file_utilsTest extends SuiteCRM\StateCheckerPHPUnitTestCaseAbstract
     public function testgenerateMD5array()
     {
 //        self::markTestIncomplete('environment dependency');
-//        
+//
 //        //execute the method and test if it returns expected values
 //
 //        $expected = array(

@@ -42,6 +42,8 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
+require_once(__DIR__.'/../SugarCache/SugarCache.php');
+
 /**
  * sugar_mkdir
  * Call this function instead of mkdir to apply pre-configured permission
@@ -158,7 +160,10 @@ function sugar_file_put_contents($filename, $data, $flags = null, $context = nul
         return false;
     }
 
-    return file_put_contents($filename, $data, $flags, $context);
+    $result = file_put_contents($filename, $data, $flags, $context);
+    SugarCache::cleanFile($filename);
+
+    return $result;
 }
 
 /**
@@ -425,7 +430,7 @@ function sugar_cached($file)
  */
 function sugar_is_dir($path)
 {
-    if(isset($GLOBALS['log'])) {
+    if (isset($GLOBALS['log'])) {
         $GLOBALS['log']->deprecated('sugar_file_utils.php: sugar_is_dir() is deprecated');
     }
     return is_dir($path);
@@ -440,7 +445,7 @@ function sugar_is_dir($path)
  */
 function sugar_is_file($path)
 {
-    if(isset($GLOBALS['log'])) {
+    if (isset($GLOBALS['log'])) {
         $GLOBALS['log']->deprecated('sugar_file_utils.php: sugar_is_file() is deprecated');
     }
     return is_file($path);

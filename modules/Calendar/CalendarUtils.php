@@ -76,7 +76,6 @@ class CalendarUtils
                 'parent_name',
                 'parent_id',
                 'parent_type',
-                'priority'
             ),
             'Calls' => array(
                 'name',
@@ -87,7 +86,6 @@ class CalendarUtils
                 'parent_name',
                 'parent_id',
                 'parent_type',
-                'priority'
             ),
             'Tasks' => array(
                 'name',
@@ -269,7 +267,7 @@ class CalendarUtils
         $arr = array();
 
         $type = $params['type'];
-        $interval = intval($params['interval']);
+        $interval = (int)$params['interval'];
         if ($interval < 1) {
             $interval = 1;
         }
@@ -400,26 +398,28 @@ class CalendarUtils
 				(id,user_id,{$lower_name}_id,date_modified)
 				VALUES
 		";
-		$users_filled = false;
+        $users_filled = false;
 
-		$qu = "SELECT * FROM {$bean->rel_contacts_table} WHERE deleted = 0 AND {$lower_name}_id = '{$id}'";
-		$re = $db->query($qu);
-		$contacts_rel_arr = array();
-		while($ro = $db->fetchByAssoc($re))
-			$contacts_rel_arr[] = $ro['contact_id'];
-		$qu_contacts = "
+        $qu = "SELECT * FROM {$bean->rel_contacts_table} WHERE deleted = 0 AND {$lower_name}_id = '{$id}'";
+        $re = $db->query($qu);
+        $contacts_rel_arr = array();
+        while ($ro = $db->fetchByAssoc($re)) {
+            $contacts_rel_arr[] = $ro['contact_id'];
+        }
+        $qu_contacts = "
 				INSERT INTO {$bean->rel_contacts_table}
 				(id,contact_id,{$lower_name}_id,date_modified)
 				VALUES
 		";
-		$contacts_filled = false;
+        $contacts_filled = false;
 
-		$qu = "SELECT * FROM {$bean->rel_leads_table} WHERE deleted = 0 AND {$lower_name}_id = '{$id}'";
-		$re = $db->query($qu);
-		$leads_rel_arr = array();
-		while($ro = $db->fetchByAssoc($re))
-			$leads_rel_arr[] = $ro['lead_id'];
-		$qu_leads = "
+        $qu = "SELECT * FROM {$bean->rel_leads_table} WHERE deleted = 0 AND {$lower_name}_id = '{$id}'";
+        $re = $db->query($qu);
+        $leads_rel_arr = array();
+        while ($ro = $db->fetchByAssoc($re)) {
+            $leads_rel_arr[] = $ro['lead_id'];
+        }
+        $qu_leads = "
 				INSERT INTO {$bean->rel_leads_table}
 				(id,lead_id,{$lower_name}_id,date_modified)
 				VALUES

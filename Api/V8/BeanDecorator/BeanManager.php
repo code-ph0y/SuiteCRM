@@ -10,12 +10,12 @@ class BeanManager
     /**
      * @var \DBManager
      */
-    private $db;
+    protected $db;
 
     /**
      * @var array
      */
-    private $beanAliases;
+    protected $beanAliases;
 
     /**
      * @param \DBManager $db
@@ -223,6 +223,6 @@ class BeanManager
             )
         )["cnt"];
 
-        return intval($rowCount);
+        return (int)$rowCount;
     }
 }

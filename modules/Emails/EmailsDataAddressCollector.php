@@ -186,8 +186,10 @@ class EmailsDataAddressCollector
     protected function validateInboundEmail($inboundEmail = null)
     {
         if (!$inboundEmail instanceof InboundEmail) {
-            throw new InvalidArgumentException('Inbound Email Account should be a valid Inbound Email. ' . gettype($inboundEmail) . ' given.',
-                self::ERR_INVALID_INBOUND_EMAIL_TYPE);
+            throw new InvalidArgumentException(
+                'Inbound Email Account should be a valid Inbound Email. ' . gettype($inboundEmail) . ' given.',
+                self::ERR_INVALID_INBOUND_EMAIL_TYPE
+            );
         }
     }
 
@@ -676,11 +678,10 @@ class EmailsDataAddressCollector
     protected function fillDataAddressFromPersonal($dataAddresses)
     {
         foreach ($dataAddresses as $address => $userAddress) {
-
             if ($userAddress['type'] !== 'system') {
                 $emailInfo = $userAddress['attributes'];
-                $fromString = $this->addCurrentUserToEmailString($emailInfo['from']);
-                $replyString = $this->addCurrentUserToEmailString($emailInfo['reply_to']);
+                $fromString = $emailInfo['from'];
+                $replyString = $emailInfo['reply_to'];
 
                 $dataAddresses[$address]['attributes'] = [
                     'from' => $fromString,

@@ -11,19 +11,21 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
      * @var StateSaver
      */
     protected $state;
-    
-    protected function setUp() {
+
+    protected function setUp()
+    {
         parent::setUp();
-        
+
         $this->state = new StateSaver();
         $this->state->pushTable('user_preferences');
         $this->state->pushTable('users');
     }
-    
-    protected function tearDown() {
+
+    protected function tearDown()
+    {
         $this->state->popTable('users');
         $this->state->popTable('user_preferences');
-        
+
         parent::tearDown();
     }
 
@@ -78,16 +80,15 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $state = new StateSaver();
         $state->pushTable('tracker');
         $state->pushGlobals();
-        
+        $state->pushPHPConfigOptions();
+
+        // suppress output during the test
+        $this->setOutputCallback(function () {});
+
         // test
-        
-        
-        
         $SugarController = new SugarController();
 
         // replace and use a temporary logger
-
-
         $logger = $GLOBALS['log'];
         $GLOBALS['log'] = new TestLogger();
 
@@ -99,17 +100,14 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         }
 
         // change back to original logger
-
         $testLogger = $GLOBALS['log'];
         $GLOBALS['log'] = $logger;
 
         // exam log
-
-
         $this->assertTrue(true);
         
         // clean up
-        
+        $state->popPHPConfigOptions();
         $state->popGlobals();
         $state->popTable('tracker');
     }
@@ -132,8 +130,6 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         }
 
         $this->assertTrue(true);
-        
-        // clean up
     }
 
     public function testpre_save()
@@ -165,7 +161,6 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $this->assertTrue(true);
         
         // cleanup
-        
         if (isset($session)) {
             $_SESSION = $session;
         } else {
@@ -181,6 +176,8 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $state = new StateSaver();
         $state->pushTable('aod_index');
         $state->pushTable('tracker');
+        $state->pushTable('users');
+        $state->pushTable('user_preferences');
         
         if (isset($_SESSION)) {
             $session = $_SESSION;
@@ -210,7 +207,6 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $this->assertTrue(true);
         
         // cleanup
-        
         if (isset($session)) {
             $_SESSION = $session;
         } else {
@@ -220,6 +216,8 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $query = "UPDATE users SET date_modified = '$testUserDateModified' WHERE id = '$testUserId' LIMIT 1";
         DBManagerFactory::getInstance()->query($query);
         
+        $state->popTable('user_preferences');
+        $state->popTable('users');
         $state->popTable('tracker');
         $state->popTable('aod_index');
     }
@@ -228,22 +226,21 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
     {
         $SugarController = new SugarController();
 
-        //first check with default value of attribute
+        // check with default value of attribute
         $this->assertAttributeEquals('classic', 'view', $SugarController);
 
-        //secondly check for attribute value change on method execution.
+        // check for attribute value change on method execution.
         $SugarController->action_spot();
         $this->assertAttributeEquals('spot', 'view', $SugarController);
     }
 
     public function testgetActionFilename()
     {
-
-        //first check with a invalid value
+        // check with an invalid value
         $action = SugarController::getActionFilename('');
         $this->assertEquals('', $action);
 
-        //secondly check with a valid value
+        // check with a valid value
         $action = SugarController::getActionFilename('editview');
         $this->assertEquals('EditView', $action);
     }
@@ -256,23 +253,21 @@ class SugarControllerTest extends StateCheckerPHPUnitTestCaseAbstract
         $state->pushGlobals();
         
         // test
-        
         $SugarController = new SugarController();
 
-        //check with a invalid value
+        // check with a invalid value
         $result = $SugarController->checkEntryPointRequiresAuth('');
         $this->assertTrue($result);
 
-        //cehck with a valid True value
+        // check with a valid True value
         $result = $SugarController->checkEntryPointRequiresAuth('download');
         $this->assertTrue($result);
 
-        //cehck with a valid False value
+        // check with a valid False value
         $result = $SugarController->checkEntryPointRequiresAuth('GeneratePassword');
         $this->assertFalse($result);
         
         // clean up
-        
         $state->popGlobals();
     }
 }

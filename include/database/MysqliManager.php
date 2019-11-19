@@ -134,11 +134,11 @@ class MysqliManager extends MysqlManager
         $this->checkConnection();
         $this->query_time = microtime(true);
         $this->lastsql = $sql;
-        if(!empty($sql)) {
+        if (!empty($sql)) {
             if ($this->database instanceof mysqli) {
                 $result = $suppress ? @mysqli_query($this->database, $sql) : mysqli_query($this->database, $sql);
-                if($result === false && !$suppress) {
-                    if(inDeveloperMode()) {
+                if ($result === false && !$suppress) {
+                    if (inDeveloperMode()) {
                         LoggerManager::getLogger()->debug('Mysqli_query failed, error was: ' . $this->lastDbError() . ', query was: ');
                     }
                     LoggerManager::getLogger()->fatal('Mysqli_query failed.');
@@ -218,7 +218,7 @@ class MysqliManager extends MysqlManager
         }
         if (!empty($this->database)) {
             $this->freeResult();
-            if(!@mysqli_close($this->database)) {
+            if (!@mysqli_close($this->database)) {
                 $GLOBALS['log']->fatal('mysqli_close() failed');
             }
             $this->database = null;
@@ -313,8 +313,13 @@ class MysqliManager extends MysqlManager
                 $dbport = substr($configOptions['db_host_name'], $pos + 1);
             }
 
-            $this->database = @mysqli_connect($dbhost, $configOptions['db_user_name'], $configOptions['db_password'],
-                isset($configOptions['db_name']) ? $configOptions['db_name'] : '', $dbport);
+            $this->database = @mysqli_connect(
+                $dbhost,
+                $configOptions['db_user_name'],
+                $configOptions['db_password'],
+                isset($configOptions['db_name']) ? $configOptions['db_name'] : '',
+                $dbport
+            );
             if (empty($this->database)) {
                 $GLOBALS['log']->fatal("Could not connect to DB server " . $dbhost . " as " . $configOptions['db_user_name'] . ". port " . $dbport . ": " . mysqli_connect_error());
                 if ($dieOnError) {
@@ -350,6 +355,11 @@ class MysqliManager extends MysqlManager
             mysqli_query($this->database, $names);
         }
         mysqli_set_charset($this->database, "utf8");
+
+        // https://github.com/salesagility/SuiteCRM/issues/7107
+        // MySQL 5.7 is stricter regarding missing values in SQL statements and makes some tests fail.
+        // Remove STRICT_TRANS_TABLES from sql_mode so we get the old behaviour again.
+        mysqli_query($this->database, "SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode, 'STRICT_TRANS_TABLES', ''))");
 
         if ($this->checkError('Could Not Connect', $dieOnError)) {
             $GLOBALS['log']->info("connected to db");

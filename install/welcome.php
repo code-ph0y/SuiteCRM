@@ -41,7 +41,7 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-if( !isset( $install_script ) || !$install_script ){
+if (!isset($install_script) || !$install_script) {
     die($mod_strings['ERR_NO_DIRECT_SCRIPT']);
 }
 // $mod_strings come from calling page.
@@ -55,7 +55,7 @@ $_SESSION['setup_license_accept']   = get_boolean_from_request('setup_license_ac
 $_SESSION['license_submitted']      = true;
 
 // setup session variables (and their defaults) if this page has not yet been submitted
-if(!isset($_SESSION['license_submitted']) || !$_SESSION['license_submitted']){
+if (!isset($_SESSION['license_submitted']) || !$_SESSION['license_submitted']) {
     $_SESSION['setup_license_accept'] = false;
 }
 
@@ -69,7 +69,7 @@ $langHeader = get_language_header();
 // load javascripts
 include('jssource/JSGroupings.php');
 $jsSrc = '';
-foreach($sugar_grp1_yui as $jsFile => $grp) {
+foreach ($sugar_grp1_yui as $jsFile => $grp) {
     $jsSrc .= "\t<script src=\"$jsFile\"></script>\n";
 }
 
@@ -167,7 +167,7 @@ $out = <<<EOQ
         <!-- </td></tr></table> -->
     </div>
 	<footer id="install_footer">
-        <p id="footer_links"><a href="https://suitecrm.com" target="_blank">Visit suitecrm.com</a> | <a href="https://suitecrm.com/index.php?option=com_kunena&view=category&Itemid=1137&layout=list" target="_blank">Support Forums</a> | <a href="https://docs.suitecrm.com/admin/installation-guide/" target="_blank">Installation Guide</a> | <a href="LICENSE.txt" target="_blank">License</a>
+        <p id="footer_links"><a href="https://suitecrm.com" target="_blank">Visit suitecrm.com</a> | <a href="https://suitecrm.com/suitecrm/forum" target="_blank">Support Forums</a> | <a href="https://docs.suitecrm.com/admin/installation-guide/" target="_blank">Installation Guide</a> | <a href="LICENSE.txt" target="_blank">License</a>
     </footer>
     </div>
 <script>
@@ -332,7 +332,7 @@ function onLangSelect(e) {
 </html>
 EOQ;
 if (check_php_version() === -1) {
-    if(empty($mod_strings['LBL_MINIMUM_PHP_VERSION'])){
+    if (empty($mod_strings['LBL_MINIMUM_PHP_VERSION'])) {
         $mod_strings['LBL_MINIMUM_PHP_VERSION'] = 'The minimum PHP version required is '.constant('SUITECRM_PHP_MIN_VERSION');
     }
 

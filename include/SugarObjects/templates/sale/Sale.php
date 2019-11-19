@@ -46,7 +46,6 @@ require_once 'include/SugarObjects/templates/basic/Basic.php';
 
 class Sale extends Basic
 {
-
     public $amount_usdollar;
     public $currency_id;
 
@@ -56,23 +55,6 @@ class Sale extends Basic
     public function __construct()
     {
         parent::__construct();
-
-    }
-
-    /**
-     * @deprecated deprecated since version 7.6, PHP4 Style Constructors are deprecated and will be remove in 8.0,
-     *     please update your code, use __construct instead
-     */
-    public function Sale()
-    {
-        $deprecatedMessage =
-            'PHP4 Style Constructors are deprecated and will be remove in 8.0, please update your code';
-        if (isset($GLOBALS['log'])) {
-            $GLOBALS['log']->deprecated($deprecatedMessage);
-        } else {
-            trigger_error($deprecatedMessage, E_USER_DEPRECATED);
-        }
-        self::__construct();
     }
 
     /**

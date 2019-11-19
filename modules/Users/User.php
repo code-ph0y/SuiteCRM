@@ -5,7 +5,7 @@
  * SugarCRM, Inc. Copyright (C) 2004-2013 SugarCRM Inc.
  *
  * SuiteCRM is an extension to SugarCRM Community Edition developed by SalesAgility Ltd.
- * Copyright (C) 2011 - 2018 SalesAgility Ltd.
+ * Copyright (C) 2011 - 2019 SalesAgility Ltd.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License version 3 as published by the
@@ -120,17 +120,17 @@ class User extends Person implements EmailInterface
      * @var string
      */
     public $factor_auth_interface;
-    
+
     /**
-     * Normally a bean returns ID from save() method if it was 
+     * Normally a bean returns ID from save() method if it was
      * success and false (or maybe null) is something went wrong.
-     * BUT (for some reason) if User bean saved properly except 
-     * the email addresses of it, this User::save() method also 
+     * BUT (for some reason) if User bean saved properly except
+     * the email addresses of it, this User::save() method also
      * return a false.
-     * It's a confusing ambiguous return value for caller method. 
-     * 
-     * To handle this issue when save method can not save email 
-     * addresses and return false it also set this variable to 
+     * It's a confusing ambiguous return value for caller method.
+     *
+     * To handle this issue when save method can not save email
+     * addresses and return false it also set this variable to
      * true.
      *
      * @var bool|null
@@ -152,19 +152,7 @@ class User extends Person implements EmailInterface
         }
     }
 
-    /**
-     * @deprecated deprecated since version 7.6, PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code, use __construct instead
-     */
-    public function User()
-    {
-        $deprecatedMessage = 'PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code';
-        if (isset($GLOBALS['log'])) {
-            $GLOBALS['log']->deprecated($deprecatedMessage);
-        } else {
-            trigger_error($deprecatedMessage, E_USER_DEPRECATED);
-        }
-        self::__construct();
-    }
+
 
     protected function _loadUserPreferencesFocus()
     {
@@ -248,7 +236,11 @@ class User extends Person implements EmailInterface
      * @throws \RuntimeException
      */
     public function getSignatures(
-    $live = false, $defaultSig = '', $forSettings = false, $elementId = 'signature_id', $useRequestedRecord = false
+        $live = false,
+        $defaultSig = '',
+        $forSettings = false,
+        $elementId = 'signature_id',
+        $useRequestedRecord = false
     ) {
         $sig = $this->getSignaturesArray($useRequestedRecord);
         $sigs = array();
@@ -280,7 +272,11 @@ class User extends Person implements EmailInterface
      * @throws \RuntimeException
      */
     public function getEmailAccountSignatures(
-    $live = false, $defaultSig = '', $forSettings = false, $elementId = 'account_signature_id', $useRequestedRecord = false
+        $live = false,
+        $defaultSig = '',
+        $forSettings = false,
+        $elementId = 'account_signature_id',
+        $useRequestedRecord = false
     ) {
         $sig = $this->getSignaturesArray($useRequestedRecord);
         $sigs = array();
@@ -352,17 +348,15 @@ class User extends Person implements EmailInterface
         $userPrivGuid = $this->getPreference('userPrivGuid', 'global', $this);
         if ($userPrivGuid) {
             return $userPrivGuid;
-        } else {
-            $this->setUserPrivGuid();
-            if (!isset($_SESSION['setPrivGuid'])) {
-                $_SESSION['setPrivGuid'] = true;
-                $userPrivGuid = $this->getUserPrivGuid();
-
-                return $userPrivGuid;
-            } else {
-                sugar_die("Breaking Infinite Loop Condition: Could not setUserPrivGuid.");
-            }
         }
+        $this->setUserPrivGuid();
+        if (!isset($_SESSION['setPrivGuid'])) {
+            $_SESSION['setPrivGuid'] = true;
+            $userPrivGuid = $this->getUserPrivGuid();
+
+            return $userPrivGuid;
+        }
+        sugar_die("Breaking Infinite Loop Condition: Could not setUserPrivGuid.");
     }
 
     public function setUserPrivGuid()
@@ -383,7 +377,10 @@ class User extends Person implements EmailInterface
      * @param string $category Name of the category to retrieve
      */
     public function setPreference(
-    $name, $value, $nosession = 0, $category = 'global'
+        $name,
+        $value,
+        $nosession = 0,
+        $category = 'global'
     ) {
         // for BC
         if (func_num_args() > 4) {
@@ -404,7 +401,7 @@ class User extends Person implements EmailInterface
      * @param string $category category to reset
      */
     public function resetPreferences(
-    $category = null
+        $category = null
     ) {
         // for BC
         if (func_num_args() > 1) {
@@ -474,7 +471,7 @@ class User extends Person implements EmailInterface
      * @return bool successful?
      */
     public function loadPreferences(
-    $category = 'global'
+        $category = 'global'
     ) {
         // for BC
         if (func_num_args() > 1) {
@@ -519,7 +516,7 @@ class User extends Person implements EmailInterface
      * @internal param bool $useRequestedRecord
      */
     public function getPreference(
-    $name,
+        $name,
         $category = 'global'
     ) {
         // for BC
@@ -587,26 +584,27 @@ class User extends Person implements EmailInterface
     }
 
     /**
-     * Normally a bean returns ID from save() method if it was 
+     * Normally a bean returns ID from save() method if it was
      * success and false (or maybe null) is something went wrong.
-     * BUT (for some reason) if User bean saved properly except 
-     * the email addresses of it, this User::save() method also 
+     * BUT (for some reason) if User bean saved properly except
+     * the email addresses of it, this User::save() method also
      * return a false.
-     * It's a confusing ambiguous return value for caller method. 
-     * 
-     * To handle this issue when save method can not save email 
+     * It's a confusing ambiguous return value for caller method.
+     *
+     * To handle this issue when save method can not save email
      * addresses and return false it also set the variable called
      * User::$lastSaveErrorIsEmailAddressSaveError to true.
-     * 
+     *
      * @global User $current_user
      * @global array $sugar_config
      * @global array $mod_strings
      * @param bool $check_notify
-     * @return boolean
+     * @return bool|string
+     * @throws SuiteException
      */
     public function save($check_notify = false)
     {
-        global $current_user, $sugar_config, $mod_strings;
+        global $current_user, $mod_strings;
 
         $msg = '';
 
@@ -626,7 +624,7 @@ class User extends Person implements EmailInterface
             if ($smtp_error) {
                 $msg .= 'SMTP server settings required first.';
                 $GLOBALS['log']->warn($msg);
-                if(isset($mod_strings['ERR_USER_FACTOR_SMTP_REQUIRED'])) {
+                if (isset($mod_strings['ERR_USER_FACTOR_SMTP_REQUIRED'])) {
                     SugarApplication::appendErrorMessage($mod_strings['ERR_USER_FACTOR_SMTP_REQUIRED']);
                 }
             } else {
@@ -636,15 +634,13 @@ class User extends Person implements EmailInterface
                     SugarApplication::appendErrorMessage($mod_strings['ERR_USER_FACTOR_CHANGE_DISABLED']);
                 }
             }
-            if($tmpUser) {
+            if ($tmpUser) {
                 $this->factor_auth = $tmpUser->factor_auth;
                 $this->factor_auth_interface = $tmpUser->factor_auth_interface;
             }
         }
 
         if ($this->factor_auth && $isUpdate && is_admin($current_user)) {
-            $tmpUser = BeanFactory::getBean('Users', $this->id);
-
             $factorAuthFactory = new FactorAuthFactory();
             $factorAuth = $factorAuthFactory->getFactorAuth($this);
 
@@ -652,10 +648,6 @@ class User extends Person implements EmailInterface
                 $this->factor_auth = false;
             }
         }
-
-
-        $query = "SELECT count(id) as total from users WHERE " . self::getLicensedUsersWhere();
-
 
         // is_group & portal should be set to 0 by default
         if (!isset($this->is_group)) {
@@ -678,12 +670,17 @@ class User extends Person implements EmailInterface
         // set some default preferences when creating a new user
         $setNewUserPreferences = empty($this->id) || !empty($this->new_with_id);
 
+        if (!$this->verify_data()) {
+            SugarApplication::appendErrorMessage($this->error_string);
+            return SugarApplication::redirect('Location: index.php?action=Error&module=Users');
+        }
+
 
         $retId = parent::save($check_notify);
         if (!$retId) {
             LoggerManager::getLogger()->fatal('save error: User is not saved, Person ID is not returned.');
         }
-        if ($retId != $this->id) {
+        if ($retId !== $this->id) {
             LoggerManager::getLogger()->fatal('save error: User is not saved properly, returned Person ID does not match to User ID.');
         }
         // set some default preferences when creating a new user
@@ -697,6 +694,21 @@ class User extends Person implements EmailInterface
 
         $this->savePreferencesToDB();
 
+        if ((isset($_POST['old_password']) || $this->portal_only) &&
+            (isset($_POST['new_password']) && !empty($_POST['new_password'])) &&
+            (isset($_POST['password_change']) && $_POST['password_change'] === 'true')) {
+            if (!$this->change_password($_POST['old_password'], $_POST['new_password'])) {
+                if (isset($_POST['page']) && $_POST['page'] === 'EditView') {
+                    SugarApplication::appendErrorMessage($this->error_string);
+                    SugarApplication::redirect("Location: index.php?action=EditView&module=Users&record=" . $_POST['record']);
+                }
+                if (isset($_POST['page']) && $_POST['page'] === 'Change') {
+                    SugarApplication::appendErrorMessage($this->error_string);
+                    SugarApplication::redirect("Location: index.php?action=ChangePassword&module=Users&record=" . $_POST['record']);
+                }
+            }
+        }
+
         // User Profile specific save for Email addresses
         $this->lastSaveErrorIsEmailAddressSaveError = false;
         if (!$this->emailAddress->saveAtUserProfile($_REQUEST)) {
@@ -708,12 +720,12 @@ class User extends Person implements EmailInterface
         return $this->id;
     }
 
-    public function saveFormPreferences(){
+    public function saveFormPreferences()
+    {
         if (!$this->is_group && !$this->portal_only) {
-
             require_once('modules/MySettings/TabController.php');
 
-            global $current_user;
+            global $current_user, $sugar_config;
 
             $display_tabs_def = isset($_REQUEST['display_tabs_def']) ? urldecode($_REQUEST['display_tabs_def']) : '';
             $hide_tabs_def = isset($_REQUEST['hide_tabs_def']) ? urldecode($_REQUEST['hide_tabs_def']) : '';
@@ -730,11 +742,11 @@ class User extends Person implements EmailInterface
             $this->is_group = 0;
             $this->portal_only = 0;
 
-            if ((isset($_POST['is_admin']) && ($_POST['is_admin'] == 'on' || $_POST['is_admin'] == '1')) ||
-              (isset($_POST['UserType']) && $_POST['UserType'] == "Administrator"))
+            if (is_admin($current_user) && ((isset($_POST['is_admin']) && ($_POST['is_admin'] === 'on' || $_POST['is_admin'] === '1')) || (isset($_POST['UserType']) && $_POST['UserType'] === 'Administrator'))) {
                 $this->is_admin = 1;
-            elseif (isset($_POST['is_admin']) && empty($_POST['is_admin']))
+            } elseif (isset($_POST['is_admin']) && empty($_POST['is_admin'])) {
                 $this->is_admin = 0;
+            }
 
             if (isset($_POST['mailmerge_on']) && !empty($_POST['mailmerge_on'])) {
                 $this->setPreference('mailmerge_on', 'on', 0, 'global');
@@ -757,7 +769,7 @@ class User extends Person implements EmailInterface
             if (isset($_POST['use_group_tabs'])) {
                 $this->setPreference('navigation_paradigm', $_POST['use_group_tabs'], 0, 'global');
             } else {
-                $this->setPreference('navigation_paradigm', $GLOBALS['sugar_config']['default_navigation_paradigm'] , 0, 'global');
+                $this->setPreference('navigation_paradigm', $GLOBALS['sugar_config']['default_navigation_paradigm'], 0, 'global');
             }
 
             if (isset($_POST['sort_modules_by_name'])) {
@@ -790,8 +802,9 @@ class User extends Person implements EmailInterface
             }
 
             $tabs = new TabController();
-            if (isset($_POST['display_tabs']))
+            if (isset($_POST['display_tabs'])) {
                 $tabs->set_user_tabs($DISPLAY_ARR['display_tabs'], $this, 'display');
+            }
             if (isset($HIDE_ARR['hide_tabs'])) {
                 $tabs->set_user_tabs($HIDE_ARR['hide_tabs'], $this, 'hide');
             } else {
@@ -824,48 +837,68 @@ class User extends Person implements EmailInterface
                 $this->setPreference('email_reminder_checked', $_POST['email_reminder_checked'], 0, 'global');
             }
 
-            if (isset($_POST['timezone']))
+            if (isset($_POST['timezone'])) {
                 $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
-            if (isset($_POST['ut']))
+            }
+            if (isset($_POST['ut'])) {
                 $this->setPreference('ut', '0', 0, 'global');
-            else
+            } else {
                 $this->setPreference('ut', '1', 0, 'global');
-            if (isset($_POST['currency']))
+            }
+            if (isset($_POST['currency'])) {
                 $this->setPreference('currency', $_POST['currency'], 0, 'global');
-            if (isset($_POST['default_currency_significant_digits']))
+            }
+            if (isset($_POST['default_currency_significant_digits'])) {
                 $this->setPreference('default_currency_significant_digits', $_POST['default_currency_significant_digits'], 0, 'global');
-            if (isset($_POST['num_grp_sep']))
+            }
+            if (isset($_POST['num_grp_sep'])) {
                 $this->setPreference('num_grp_sep', $_POST['num_grp_sep'], 0, 'global');
-            if (isset($_POST['dec_sep']))
+            }
+            if (isset($_POST['dec_sep'])) {
                 $this->setPreference('dec_sep', $_POST['dec_sep'], 0, 'global');
-            if (isset($_POST['fdow']))
+            }
+            if (isset($_POST['fdow'])) {
                 $this->setPreference('fdow', $_POST['fdow'], 0, 'global');
-            if (isset($_POST['dateformat']))
+            }
+            if (isset($_POST['dateformat'])) {
                 $this->setPreference('datef', $_POST['dateformat'], 0, 'global');
-            if (isset($_POST['timeformat']))
+            }
+            if (isset($_POST['timeformat'])) {
                 $this->setPreference('timef', $_POST['timeformat'], 0, 'global');
-            if (isset($_POST['timezone']))
+            }
+            if (isset($_POST['timezone'])) {
                 $this->setPreference('timezone', $_POST['timezone'], 0, 'global');
-            if (isset($_POST['mail_fromname']))
+            }
+            if (isset($_POST['mail_fromname'])) {
                 $this->setPreference('mail_fromname', $_POST['mail_fromname'], 0, 'global');
-            if (isset($_POST['mail_fromaddress']))
+            }
+            if (isset($_POST['mail_fromaddress'])) {
                 $this->setPreference('mail_fromaddress', $_POST['mail_fromaddress'], 0, 'global');
-            if (isset($_POST['mail_sendtype']))
+            }
+            if (isset($_POST['mail_sendtype'])) {
                 $this->setPreference('mail_sendtype', $_POST['mail_sendtype'], 0, 'global');
-            if (isset($_POST['mail_smtpserver']))
+            }
+            if (isset($_POST['mail_smtpserver'])) {
                 $this->setPreference('mail_smtpserver', $_POST['mail_smtpserver'], 0, 'global');
-            if (isset($_POST['mail_smtpport']))
+            }
+            if (isset($_POST['mail_smtpport'])) {
                 $this->setPreference('mail_smtpport', $_POST['mail_smtpport'], 0, 'global');
-            if (isset($_POST['mail_smtpuser']))
+            }
+            if (isset($_POST['mail_smtpuser'])) {
                 $this->setPreference('mail_smtpuser', $_POST['mail_smtpuser'], 0, 'global');
-            if (isset($_POST['mail_smtppass']))
+            }
+            if (isset($_POST['mail_smtppass'])) {
                 $this->setPreference('mail_smtppass', $_POST['mail_smtppass'], 0, 'global');
-            if (isset($_POST['default_locale_name_format']))
+            }
+            if (isset($_POST['default_locale_name_format'])) {
                 $this->setPreference('default_locale_name_format', $_POST['default_locale_name_format'], 0, 'global');
-            if (isset($_POST['export_delimiter']))
+            }
+            if (isset($_POST['export_delimiter'])) {
                 $this->setPreference('export_delimiter', $_POST['export_delimiter'], 0, 'global');
-            if (isset($_POST['default_export_charset']))
+            }
+            if (isset($_POST['default_export_charset'])) {
                 $this->setPreference('default_export_charset', $_POST['default_export_charset'], 0, 'global');
+            }
             if (isset($_POST['use_real_names'])) {
                 $this->setPreference('use_real_names', 'on', 0, 'global');
             } elseif (!isset($_POST['use_real_names']) && !isset($_POST['from_dcmenu'])) {
@@ -896,31 +929,38 @@ class User extends Person implements EmailInterface
             ///////////////////////////////////////////////////////////////////////////
             ///////////////////////////////////////////////////////////////////////////
             ////	SIGNATURES
-            if (isset($_POST['signature_id']))
+            if (isset($_POST['signature_id'])) {
                 $this->setPreference('signature_default', $_POST['signature_id'], 0, 'global');
+            }
 
-            if (isset($_POST['signature_prepend']))
+            if (isset($_POST['signature_prepend'])) {
                 $this->setPreference('signature_prepend', $_POST['signature_prepend'], 0, 'global');
+            }
             ////	END SIGNATURES
             ///////////////////////////////////////////////////////////////////////////
 
 
-            if (isset($_POST['email_link_type']))
+            if (isset($_POST['email_link_type'])) {
                 $this->setPreference('email_link_type', $_REQUEST['email_link_type']);
-            if (isset($_POST['editor_type']))
+            }
+            if (isset($_POST['editor_type'])) {
                 $this->setPreference('editor_type', $_REQUEST['editor_type']);
+            }
             if (isset($_REQUEST['email_show_counts'])) {
                 $this->setPreference('email_show_counts', $_REQUEST['email_show_counts'], 0, 'global');
             } else {
                 $this->setPreference('email_show_counts', 0, 0, 'global');
             }
-            if (isset($_REQUEST['email_editor_option']))
+            if (isset($_REQUEST['email_editor_option'])) {
                 $this->setPreference('email_editor_option', $_REQUEST['email_editor_option'], 0, 'global');
-            if (isset($_REQUEST['default_email_charset']))
+            }
+            if (isset($_REQUEST['default_email_charset'])) {
                 $this->setPreference('default_email_charset', $_REQUEST['default_email_charset'], 0, 'global');
+            }
 
-            if (isset($_POST['calendar_publish_key']))
+            if (isset($_POST['calendar_publish_key'])) {
                 $this->setPreference('calendar_publish_key', $_POST['calendar_publish_key'], 0, 'global');
+            }
             if (isset($_POST['subtheme'])) {
                 $this->setPreference('subtheme', $_POST['subtheme'], 0, 'global');
             }
@@ -928,6 +968,15 @@ class User extends Person implements EmailInterface
                 $this->setPreference('syncGCal', 1, 0, 'GoogleSync');
             } else {
                 $this->setPreference('syncGCal', 0, 0, 'GoogleSync');
+            }
+            if ($this->user_hash === null) {
+                $newUser = true;
+                clear_register_value('user_array', $this->object_name);
+            } else {
+                $newUser = false;
+            }
+            if ($newUser && !$this->is_group && !$this->portal_only && isset($sugar_config['passwordsetting']['SystemGeneratedPasswordON'])) {
+                require_once 'modules/Users/GeneratePassword.php';
             }
         }
     }
@@ -980,31 +1029,14 @@ class User extends Person implements EmailInterface
         // If the role doesn't exist in the list of the user's roles
         if (!empty($role_array) && in_array($role_name, $role_array)) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function get_summary_text()
     {
         //$this->_create_proper_name_field();
         return $this->name;
-    }
-
-    /**
-     * @deprecated
-     * @param string $user_name - Must be non null and at least 2 characters
-     * @param string $username_password - Must be non null and at least 1 character.
-     * @desc Take an unencrypted username and password and return the encrypted password
-     * @return string encrypted password for storage in DB and comparison against DB password.
-     */
-    public function encrypt_password($username_password)
-    {
-        // encrypt the password.
-        $salt = substr($this->user_name, 0, 2);
-        $encrypted_password = crypt($username_password, $salt);
-
-        return $encrypted_password;
     }
 
     /**
@@ -1018,11 +1050,10 @@ class User extends Person implements EmailInterface
         $row = self::findUserPassword($this->user_name, $password);
         if (empty($row)) {
             return false;
-        } else {
-            $this->id = $row['id'];
-
-            return true;
         }
+        $this->id = $row['id'];
+
+        return true;
     }
 
     /**
@@ -1133,49 +1164,54 @@ EOQ;
     /**
      * Generate a new hash from plaintext password
      * @param string $password
+     * @return bool|string
      */
     public static function getPasswordHash($password)
     {
-        if (!defined('CRYPT_MD5') || !constant('CRYPT_MD5')) {
-            // does not support MD5 crypt - leave as is
-            if (defined('CRYPT_EXT_DES') && constant('CRYPT_EXT_DES')) {
-                return crypt(strtolower(md5($password)), "_.012" . substr(str_shuffle('./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'), -4));
-            }
-            // plain crypt cuts password to 8 chars, which is not enough
-            // fall back to old md5
-            return strtolower(md5($password));
-        }
+        return self::getPasswordHashMD5(md5($password));
+    }
 
-        return @crypt(strtolower(md5($password)));
+    /**
+     * Generate a new hash from MD5 password
+     * @param string $passwordMd5
+     * @return bool|string
+     */
+    public static function getPasswordHashMD5($passwordMd5)
+    {
+        return password_hash(strtolower($passwordMd5), PASSWORD_DEFAULT);
     }
 
     /**
      * Check that password matches existing hash
      * @param string $password Plaintext password
-     * @param string $user_hash DB hash
+     * @param string $userHash DB hash
+     * @return bool
      */
-    public static function checkPassword($password, $user_hash)
+    public static function checkPassword($password, $userHash)
     {
-        return self::checkPasswordMD5(md5($password), $user_hash);
+        return self::checkPasswordMD5(md5($password), $userHash);
     }
 
     /**
      * Check that md5-encoded password matches existing hash
-     * @param string $password MD5-encoded password
-     * @param string $user_hash DB hash
+     * @param string $passwordMd5 MD5-encoded password
+     * @param string $userHash DB hash
      * @return bool Match or not?
      */
-    public static function checkPasswordMD5($password_md5, $user_hash)
+    public static function checkPasswordMD5($passwordMd5, $userHash)
     {
-        if (empty($user_hash)) {
+        if (empty($userHash)) {
             return false;
         }
-        if ($user_hash[0] != '$' && strlen($user_hash) == 32) {
-            // Old way - just md5 password
-            return strtolower($password_md5) == $user_hash;
+
+        if ($userHash[0] !== '$' && strlen($userHash) === 32) {
+            // Legacy md5 password
+            $valid = strtolower($passwordMd5) === $userHash;
+        } else {
+            $valid = password_verify(strtolower($passwordMd5), $userHash);
         }
 
-        return crypt(strtolower($password_md5), $user_hash) == $user_hash;
+        return $valid;
     }
 
     /**
@@ -1184,7 +1220,7 @@ EOQ;
      * @param string $password MD5-encoded password
      * @param string $where Limiting query
      * @param bool $checkPasswordMD5 use md5 check for user_hash before return the user data (default is true)
-     * @return bool|arraythe matching User of false if not found
+     * @return bool|array the matching User of false if not found
      */
     public static function findUserPassword($name, $password, $where = '', $checkPasswordMD5 = true)
     {
@@ -1203,7 +1239,7 @@ EOQ;
         if (!empty($where)) {
             $query .= " AND $where";
         }
-	$query .= " AND deleted=0";
+        $query .= " AND deleted=0";
         $result = $db->limitQuery($query, 0, 1, false);
         if (!empty($result)) {
             $row = $db->fetchByAssoc($result);
@@ -1375,7 +1411,7 @@ EOQ;
     }
 
     public function retrieve_user_id(
-    $user_name
+        $user_name
     ) {
         $userFocus = new User;
         $userFocus->retrieve_by_string_fields(array('user_name' => $user_name));
@@ -1465,7 +1501,7 @@ EOQ;
         $user_fields = parent::get_list_view_data();
 
         if ($this->is_admin) {
-            if(!isset($mod_strings['LBL_CHECKMARK'])) {
+            if (!isset($mod_strings['LBL_CHECKMARK'])) {
                 LoggerManager::getLogger()->warn('A language label not found: LBL_CHECKMARK');
             }
             $checkmark = isset($mod_strings['LBL_CHECKMARK']) ? $mod_strings['LBL_CHECKMARK'] : null;
@@ -1687,7 +1723,7 @@ EOQ;
         return array('email' => $prefAddr, 'name' => $this->name);
     }
 
-// fn
+    // fn
 
     public function getSystemDefaultNameAndEmail()
     {
@@ -1699,7 +1735,7 @@ EOQ;
         return array('email' => $prefAddr, 'name' => $fullName);
     }
 
-// fn
+    // fn
 
     /**
      * sets User email default in config.php if not already set by install - i.
@@ -1770,7 +1806,13 @@ EOQ;
      * @param class
      */
     public function getEmailLink2(
-    $emailAddress, &$focus, $contact_id = '', $ret_module = '', $ret_action = 'DetailView', $ret_id = '', $class = ''
+        $emailAddress,
+        &$focus,
+        $contact_id = '',
+        $ret_module = '',
+        $ret_action = 'DetailView',
+        $ret_id = '',
+        $class = ''
     ) {
         $emailLink = '';
 
@@ -1795,7 +1837,8 @@ EOQ;
      *
      * @return string
      */
-    public function getEmailClient() {
+    public function getEmailClient()
+    {
         global $sugar_config;
 
         if (!isset($sugar_config['email_default_client'])) {
@@ -1826,7 +1869,13 @@ EOQ;
      * @param class
      */
     public function getEmailLink(
-    $attribute, &$focus, $contact_id = '', $ret_module = '', $ret_action = 'DetailView', $ret_id = '', $class = ''
+        $attribute,
+        &$focus,
+        $contact_id = '',
+        $ret_module = '',
+        $ret_action = 'DetailView',
+        $ret_id = '',
+        $class = ''
     ) {
         $emailUI = new EmailUI();
         $emailLink = $emailUI->populateComposeViewFields($focus);
@@ -2071,13 +2120,21 @@ EOQ;
         $localeFormat = $locale->getLocaleFormatMacro($this);
         if (strpos($localeFormat, 'l') > strpos($localeFormat, 'f')) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     public function create_new_list_query(
-    $order_by, $where, $filter = array(), $params = array(), $show_deleted = 0, $join_type = '', $return_array = false, $parentbean = null, $singleSelect = false, $ifListForExport = false
+        $order_by,
+        $where,
+        $filter = array(),
+        $params = array(),
+        $show_deleted = 0,
+        $join_type = '',
+        $return_array = false,
+        $parentbean = null,
+        $singleSelect = false,
+        $ifListForExport = false
     ) {    //call parent method, specifying for array to be returned
         $ret_array = parent::create_new_list_query($order_by, $where, $filter, $params, $show_deleted, $join_type, true, $parentbean, $singleSelect, $ifListForExport);
 
@@ -2165,7 +2222,7 @@ EOQ;
 
         // Create random characters for the ones that doesnt have requirements
         for ($i = 0; $i < $length - $condition; $i++) {  // loop and create password
-            $password = $password . substr($charBKT, rand() % strlen($charBKT), 1);
+            $password = $password . substr($charBKT, mt_rand() % strlen($charBKT), 1);
         }
 
         return $password;
@@ -2320,9 +2377,8 @@ EOQ;
     {
         if (!empty($this->email1) && !empty($email) && strcasecmp($this->email1, $email) == 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function getEditorType()
@@ -2336,19 +2392,20 @@ EOQ;
         return $editorType;
     }
 
-    public function getSubThemes() {
+    public function getSubThemes()
+    {
         $sugarTheme = new SugarTheme(array());
         $subThemes = $sugarTheme->getSubThemes();
         return $subThemes;
     }
 
-    public function getSubTheme() {
+    public function getSubTheme()
+    {
         $subTheme = $this->getPreference('subtheme');
-        if(!$subTheme) {
+        if (!$subTheme) {
             $sugarTheme = new SugarTheme(array());
             $subTheme = $sugarTheme->getSubThemeDefault();
         }
         return $subTheme;
     }
-
 }

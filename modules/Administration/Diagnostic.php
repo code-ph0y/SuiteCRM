@@ -52,25 +52,25 @@ global $theme;
 
 global $current_user;
 
-if (!is_admin($current_user)) sugar_die("Unauthorized access to administration.");
-if (isset($GLOBALS['sugar_config']['hide_admin_diagnostics']) && $GLOBALS['sugar_config']['hide_admin_diagnostics'])
-{
+if (!is_admin($current_user)) {
+    sugar_die("Unauthorized access to administration.");
+}
+if (isset($GLOBALS['sugar_config']['hide_admin_diagnostics']) && $GLOBALS['sugar_config']['hide_admin_diagnostics']) {
     sugar_die("Unauthorized access to diagnostic tool.");
 }
 
 $db = DBManagerFactory::getInstance();
-if(empty($db)) {
-	
-	$db = DBManagerFactory::getInstance();
+if (empty($db)) {
+    $db = DBManagerFactory::getInstance();
 }
 
 echo getClassicModuleTitle(
-        "Administration", 
-        array(
+    "Administration",
+    array(
             "<a href='index.php?module=Administration&action=index'>{$mod_strings['LBL_MODULE_NAME']}</a>",
            translate('LBL_DIAGNOSTIC_TITLE')
-           ), 
-        false
+           ),
+    false
         );
 
 global $currentModule;
@@ -89,7 +89,7 @@ $sugar_smarty->assign("MODULE", $currentModule);
 $sugar_smarty->assign("PRINT_URL", "index.php?".$GLOBALS['request_string']);
 
 
-$sugar_smarty->assign("ADVANCED_SEARCH_PNG", SugarThemeRegistry::current()->getImage('advanced_search','border="0"',null,null,'.gif',$app_strings['LNK_ADVANCED_FILTER']));
-$sugar_smarty->assign("BASIC_SEARCH_PNG", SugarThemeRegistry::current()->getImage('basic_search','border="0"',null,null,'.gif',$app_strings['LNK_BASIC_FILTER']));
+$sugar_smarty->assign("ADVANCED_SEARCH_PNG", SugarThemeRegistry::current()->getImage('advanced_search', 'border="0"', null, null, '.gif', $app_strings['LNK_ADVANCED_FILTER']));
+$sugar_smarty->assign("BASIC_SEARCH_PNG", SugarThemeRegistry::current()->getImage('basic_search', 'border="0"', null, null, '.gif', $app_strings['LNK_BASIC_FILTER']));
 
 $sugar_smarty->display("modules/Administration/Diagnostic.tpl");

@@ -71,21 +71,6 @@ class SugarFieldBase
     }
 
     /**
-     * @deprecated deprecated since version 7.6, PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code, use __construct instead
-     * @param $type
-     */
-    public function SugarFieldBase($type)
-    {
-        $deprecatedMessage = 'PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code';
-        if (isset($GLOBALS['log'])) {
-            $GLOBALS['log']->deprecated($deprecatedMessage);
-        } else {
-            trigger_error($deprecatedMessage, E_USER_DEPRECATED);
-        }
-        self::__construct($type);
-    }
-
-    /**
      * parse and fetch template
      * @param string $path template
      * @return string
@@ -100,7 +85,6 @@ class SugarFieldBase
             foreach ($this->buttons as $v) {
                 $additional .= ' <input type="button" class="button" ' . $v . '>';
             }
-
         }
         if (!empty($this->image)) {
             $additional .= ' <img ' . $this->image . '>';
@@ -342,7 +326,6 @@ class SugarFieldBase
 
     public function displayFromFunc($displayType, $parentFieldArray, $vardef, $displayParams, $tabindex = 0)
     {
-
         if (!is_array($vardef['function'])) {
             $funcName = $vardef['function'];
             $includeFile = '';
@@ -376,8 +359,12 @@ class SugarFieldBase
                     require_once($includeFile);
                 }
 
-                return $funcName($parentFieldArray, $vardef['name'], $parentFieldArray[strtoupper($vardef['name'])],
-                    $displayType);
+                return $funcName(
+                    $parentFieldArray,
+                    $vardef['name'],
+                    $parentFieldArray[strtoupper($vardef['name'])],
+                    $displayType
+                );
             } else {
                 $displayTypeFunc = 'get' . $displayType . 'Smarty';
 
@@ -444,7 +431,6 @@ class SugarFieldBase
 
     public function getQueryLike()
     {
-
     }
 
     public function getQueryIn()
@@ -512,8 +498,6 @@ class SugarFieldBase
             $this->image = $displayParams['image'];
         }
         $this->ss->assign('displayParams', $displayParams);
-
-
     }
 
     protected function getAccessKey($vardef, $fieldType = null, $module = null)
@@ -688,6 +672,4 @@ class SugarFieldBase
 
         return $parentFieldArray;
     }
-
 }
-

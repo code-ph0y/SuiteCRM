@@ -470,6 +470,7 @@
       var mb = messageBox();
       mb.hideHeader();
       mb.hideFooter();
+      document.activeElement.blur();
       mb.setBody('<div class="email-in-progress"><img src="themes/' + SUGAR.themes.theme_name + '/images/loading.gif"></div>');
       mb.show();
       mb.on('ok', function () {
@@ -1236,6 +1237,7 @@
     }).done(function (jsonResponse) {
       var response = JSON.parse(jsonResponse);
       if (typeof response.data !== "undefined") {
+        $('.file-attachments').empty();
         $.fn.EmailsComposeView.loadAttachmentDataFromAjaxResponse(response);
       }
       if (typeof response.errors !== "undefined") {
@@ -1268,7 +1270,6 @@
 
   $.fn.EmailsComposeView.loadAttachmentDataFromAjaxResponse = function (response) {
     var isDraft = (typeof response.data.draft !== undefined && response.data.draft ? true : false);
-    $('.file-attachments').empty();
     var inputName = 'template_attachment[]';
     var removeName = 'temp_remove_attachment[]';
     if (isDraft) {
@@ -1280,13 +1281,6 @@
         .attr('type', 'hidden')
         .attr('name', 'removeAttachment')
         .appendTo($('.file-attachments'));
-      if (!isDraft) {
-        $('<input>')
-          .attr('type', 'hidden')
-          .attr('name', 'ignoreParentAttachments')
-          .attr('value', '1')
-          .appendTo($('.file-attachments'));
-      }
       for (i = 0; i < response.data.attachments.length; i++) {
         var id = response.data.attachments[i]['id'];
         var fileGroupContainer = $('<div></div>')

@@ -491,7 +491,9 @@ class Email extends Basic
         if (null !== $this->lastSaveAndStoreInSentError) {
             throw new EmailException(
                 'Last Error for method SaveAndStoreInSentFolder() already set but never checked: ' .
-                $this->lastSaveAndStoreInSentError, self::UNHANDLED_LAST_ERROR);
+                $this->lastSaveAndStoreInSentError,
+                self::UNHANDLED_LAST_ERROR
+            );
         }
         $this->lastSaveAndStoreInSentError = $err;
     }
@@ -581,19 +583,7 @@ class Email extends Basic
     }
 
 
-    /**
-     * @deprecated deprecated since version 7.6, PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code, use __construct instead
-     */
-    public function Email()
-    {
-        $deprecatedMessage = 'PHP4 Style Constructors are deprecated and will be remove in 7.8, please update your code';
-        if (isset($GLOBALS['log'])) {
-            $GLOBALS['log']->deprecated($deprecatedMessage);
-        } else {
-            trigger_error($deprecatedMessage, E_USER_DEPRECATED);
-        }
-        self::__construct();
-    }
+
 
     /**
      * assigns $this->ev with EmailUI
@@ -1233,7 +1223,7 @@ class Email extends Basic
 
                     $filename = $docRev->filename;
                     $docGUID = preg_replace('/[^a-z0-9\-]/', "", $docRev->id);
-                    $fileLocation = "upload://{$docGUID}";
+                    $fileLocation = "upload/{$docGUID}";
                     $mime_type = $docRev->file_mime_type;
                     $mail->AddAttachment(
                         $fileLocation,
@@ -1252,7 +1242,7 @@ class Email extends Basic
                         $note->name = $filename;
                         $note->filename = $filename;
                         $note->file_mime_type = $mime_type;
-                        $dest = "upload://{$note->id}";
+                        $dest = "upload/{$note->id}";
                         if (!copy($fileLocation, $dest)) {
                             $GLOBALS['log']->debug("EMAIL 2.0: could not copy SugarDocument revision file $fileLocation => $dest");
                         }
@@ -1274,7 +1264,7 @@ class Email extends Basic
                     if (!empty($note->id)) {
                         $filename = $note->filename;
                         $noteGUID = preg_replace('/[^a-z0-9\-]/', "", $note->id);
-                        $fileLocation = "upload://{$noteGUID}";
+                        $fileLocation = "upload/{$noteGUID}";
                         $mime_type = $note->file_mime_type;
                         if (!$note->embed_flag) {
                             $mail->AddAttachment($fileLocation, $filename, 'base64', $mime_type);
@@ -1955,7 +1945,7 @@ class Email extends Basic
         }
 
         $noteArray = array();
-        $q = "SELECT id FROM notes WHERE deleted = 0 AND parent_id = '" . $id . "'";
+        $q = "SELECT id FROM notes WHERE deleted = 0 AND parent_id = " . $this->db->quoted($id);
         $r = $this->db->query($q);
 
         while ($a = $this->db->fetchByAssoc($r)) {
@@ -2522,8 +2512,7 @@ class Email extends Basic
         ////    ATTACHMENTS FROM DRAFTS
         if (($this->type == 'out' || $this->type == 'draft')
             && $this->status == 'draft'
-            && isset($_REQUEST['record'])
-            && empty($_REQUEST['ignoreParentAttachments'])) {
+            && isset($_REQUEST['record'])) {
             $this->getNotes($_REQUEST['record']); // cn: get notes from OLD email for use in new email
         }
         ////    END ATTACHMENTS FROM DRAFTS
@@ -2909,8 +2898,8 @@ class Email extends Basic
         InboundEmail $ie = null,
         Email $tempEmail = null,
         $check_notify = false,
-        $options = "\\Seen")
-    {
+        $options = "\\Seen"
+    ) {
         global $mod_strings, $app_strings;
         global $current_user;
         global $sugar_config;
@@ -2972,11 +2961,15 @@ class Email extends Basic
         $mail = $this->setMailer($mail, '', $ieId);
 
         if (($mail->oe->type === 'system') && (!isset($sugar_config['email_allow_send_as_user']) || (!$sugar_config['email_allow_send_as_user']))) {
-            $mail->From =
-            $sender =
-            $ReplyToAddr = $mail->oe->smtp_from_addr;
+            $fromAddr = $mail->oe->smtp_from_addr;
+            $fromName = $mail->oe->smtp_from_name;
+
+            $mail->From = $fromAddr;
+            $sender = $fromAddr;
+            $ReplyToAddr = $fromAddr;
             isValidEmailAddress($mail->From);
-            $ReplyToName = $mail->oe->smtp_from_name;
+            $ReplyToName = $fromName;
+            $mail->FromName = $fromName;
         } else {
 
             // FROM ADDRESS
@@ -3021,8 +3014,8 @@ class Email extends Basic
         isValidEmailAddress($mail->Sender);
         $mail->AddReplyTo($ReplyToAddr, $locale->translateCharsetMIME(trim($ReplyToName), 'UTF-8', $OBCharset));
 
-        //$mail->Subject = html_entity_decode($this->name, ENT_QUOTES, 'UTF-8');
-        $mail->Subject = $this->name;
+        $mail->Subject = html_entity_decode($this->name, ENT_QUOTES, 'UTF-8');
+        //$mail->Subject = $this->name;
 
         ///////////////////////////////////////////////////////////////////////
         ////	ATTACHMENTS
@@ -3031,11 +3024,11 @@ class Email extends Basic
                 $mime_type = 'text/plain';
                 if ($note->object_name == 'Note') {
                     if (!empty($note->file->temp_file_location) && is_file($note->file->temp_file_location)) { // brandy-new file upload/attachment
-                        $file_location = "file://" . $note->file->temp_file_location;
+                        $file_location = "file/" . $note->file->temp_file_location;
                         $filename = $note->file->original_file_name;
                         $mime_type = $note->file->mime_type;
                     } else { // attachment coming from template/forward
-                        $file_location = "upload://{$note->id}";
+                        $file_location = "upload/{$note->id}";
                         // cn: bug 9723 - documents from EmailTemplates sent with Doc Name, not file name.
                         $filename = !empty($note->filename) ? $note->filename : $note->name;
                         $mime_type = $note->file_mime_type;
@@ -3044,7 +3037,7 @@ class Email extends Basic
                     $filePathName = $note->id;
                     // cn: bug 9723 - Emails with documents send GUID instead of Doc name
                     $filename = $note->getDocumentRevisionNameForDisplay();
-                    $file_location = "upload://$note->id";
+                    $file_location = "upload/$note->id";
                     $mime_type = $note->file_mime_type;
                 }
 
@@ -3147,8 +3140,8 @@ class Email extends Basic
         SugarPHPMailer $mail,
         NonGmailSentFolderHandler $nonGmailSentFolder,
         $check_notify = false,
-        $options = "\\Seen")
-    {
+        $options = "\\Seen"
+    ) {
         $ieMailId = null;
         if (!$ie) {
             $ie = new InboundEmail();
@@ -3181,8 +3174,8 @@ class Email extends Basic
         InboundEmail $ie,
         NonGmailSentFolderHandler $nonGmailSentFolder = null,
         $check_notify = false,
-        $options = "\\Seen")
-    {
+        $options = "\\Seen"
+    ) {
         $ieMailId = $this->save($check_notify);
         if ($ieMailId) {
             // mark SEEN (STORE MAIL IN SENT BOX)
@@ -3216,7 +3209,6 @@ class Email extends Basic
         $is_owner = false;
         $in_group = false; //SECURITY GROUPS
         if (!empty($this->parent_name)) {
-
             if (!empty($this->parent_name_owner)) {
                 global $current_user;
                 $is_owner = $current_user->id == $this->parent_name_owner;
@@ -3242,7 +3234,7 @@ class Email extends Basic
          */
         if (!ACLController::moduleSupportsACL($this->parent_type) || ACLController::checkAccess(
             $this->parent_type,
-                'view',
+            'view',
             $is_owner,
             'module',
             $in_group
@@ -3587,55 +3579,55 @@ class Email extends Basic
                 case 'support':
                     $email_fields['CREATE_RELATED'] = '<a href="index.php?module=Cases&action=EditView&inbound_email_id=' . $this->id . '" >' . SugarThemeRegistry::current()->getImage(
                         'CreateCases',
-                            'border="0"',
+                        'border="0"',
                         null,
                         null,
                         ".gif",
-                            $mod_strings['LBL_CREATE_CASES']
+                        $mod_strings['LBL_CREATE_CASES']
                     ) . $mod_strings['LBL_CREATE_CASE'] . '</a>';
                     break;
 
                 case 'sales':
                     $email_fields['CREATE_RELATED'] = '<a href="index.php?module=Leads&action=EditView&inbound_email_id=' . $this->id . '" >' . SugarThemeRegistry::current()->getImage(
                         'CreateLeads',
-                            'border="0"',
+                        'border="0"',
                         null,
                         null,
                         ".gif",
-                            $mod_strings['LBL_CREATE_LEADS']
+                        $mod_strings['LBL_CREATE_LEADS']
                     ) . $mod_strings['LBL_CREATE_LEAD'] . '</a>';
                     break;
 
                 case 'contact':
                     $email_fields['CREATE_RELATED'] = '<a href="index.php?module=Contacts&action=EditView&inbound_email_id=' . $this->id . '" >' . SugarThemeRegistry::current()->getImage(
                         'CreateContacts',
-                            'border="0"',
+                        'border="0"',
                         null,
                         null,
                         ".gif",
-                            $mod_strings['LBL_CREATE_CONTACTS']
+                        $mod_strings['LBL_CREATE_CONTACTS']
                     ) . $mod_strings['LBL_CREATE_CONTACT'] . '</a>';
                     break;
 
                 case 'bug':
                     $email_fields['CREATE_RELATED'] = '<a href="index.php?module=Bugs&action=EditView&inbound_email_id=' . $this->id . '" >' . SugarThemeRegistry::current()->getImage(
                         'CreateBugs',
-                            'border="0"',
+                        'border="0"',
                         null,
                         null,
                         ".gif",
-                            $mod_strings['LBL_CREATE_BUGS']
+                        $mod_strings['LBL_CREATE_BUGS']
                     ) . $mod_strings['LBL_CREATE_BUG'] . '</a>';
                     break;
 
                 case 'task':
                     $email_fields['CREATE_RELATED'] = '<a href="index.php?module=Tasks&action=EditView&inbound_email_id=' . $this->id . '" >' . SugarThemeRegistry::current()->getImage(
                         'CreateTasks',
-                            'border="0"',
+                        'border="0"',
                         null,
                         null,
                         ".gif",
-                            $mod_strings['LBL_CREATE_TASKS']
+                        $mod_strings['LBL_CREATE_TASKS']
                     ) . $mod_strings['LBL_CREATE_TASK'] . '</a>';
                     break;
 
@@ -3685,9 +3677,9 @@ class Email extends Basic
             $mod_strings = return_module_language($current_language, 'Emails');
         }
 
-        return $mod_strings['LBL_QUICK_CREATE'] . "&nbsp;<a id='$this->id' onclick='return quick_create_overlib(\"{$this->id}\", \"" . SugarThemeRegistry::current()->__toString() . "\", this);' href=\"#\" >" . SugarThemeRegistry::current()->getImage(
+        return $mod_strings['LBL_QUICK_CREATE'] . "&nbsp;<a id='$this->id' onclick='return quick_create_overlib(\"{$this->id}\", \"" . (string)SugarThemeRegistry::current() . "\", this);' href=\"#\" >" . SugarThemeRegistry::current()->getImage(
             "advanced_search",
-                "border='0' align='absmiddle'",
+            "border='0' align='absmiddle'",
             null,
             null,
             '.gif',
@@ -4203,16 +4195,16 @@ eoq;
             null,
             null,
             ".gif",
-                $mod_strings['LBL_USERS']
+            $mod_strings['LBL_USERS']
         ) . '</a>&nbsp;
 				<a href="#" id="showUsers" onClick="javascript:showUserSelect();">
 					<span style="display:none;" id="checkMark">' . SugarThemeRegistry::current()->getImage(
-                    'check_inline',
-                'border="0"',
-                    null,
-                    null,
-                    ".gif",
-                    $mod_strings['LBL_CHECK_INLINE']
+            'check_inline',
+            'border="0"',
+            null,
+            null,
+            ".gif",
+            $mod_strings['LBL_CHECK_INLINE']
                 ) . '</span>
 				</a>
 
@@ -4223,7 +4215,7 @@ eoq;
 						<td  colspan="' . $colspan . '" id="hiddenhead" onClick="hideUserSelect();" onMouseOver="this.style.border = \'outset red 1px\';" onMouseOut="this.style.border = \'inset white 0px\';this.style.borderBottom = \'inset red 1px\';">
 							<a href="#" onClick="javascript:hideUserSelect();">' . SugarThemeRegistry::current()->getImage(
                     'close',
-                'border="0"',
+                    'border="0"',
                     null,
                     null,
                     ".gif",
@@ -4548,7 +4540,7 @@ eoq;
 
             $bean->to_addrs_arr[] = array(
                 'email' => $email,
-                'display' => mb_encode_mimeheader($display, 'UTF-8', 'Q')
+                'display' => $display
             );
         }
 
@@ -4729,12 +4721,12 @@ eoq;
 
             if (
                 $emailAddress !== null
-                && $emailAddress->getConfirmedOptInState() != EmailAddress::COI_STAT_CONFIRMED_OPT_IN
-                && empty($emailAddress->confirm_opt_in_sent_date)
+                && $emailAddress->confirm_opt_in_sent_date === null
+                && $emailAddress->email_address !== null && $emailAddress->getConfirmedOptInState() === EmailAddress::COI_STAT_CONFIRMED_OPT_IN
             ) {
                 $ret = $this->sendOptInEmail($emailAddress);
                 if (!$ret) {
-                    LoggerManager::getLogger()->error('Error sending opt-in email to: ' . $emailAddress);
+                    LoggerManager::getLogger()->error('Error sending opt-in email to: ' . $emailAddress->email_address);
                 }
             }
         }

@@ -83,7 +83,7 @@ $dictionary['AOR_Scheduled_Reports'] = array(
             'importable' => 'required',
         ),
         'email_recipients' =>
-            array (
+            array(
                 'required' => false,
                 'name' => 'email_recipients',
                 'vname' => 'LBL_EMAIL_RECIPIENTS',
@@ -95,7 +95,7 @@ $dictionary['AOR_Scheduled_Reports'] = array(
                 'audited' => false,
                 'reportable' => false,
                 'function' =>
-                    array (
+                    array(
                         'name' => 'display_email_lines',
                         'returns' => 'html',
                         'include' => 'modules/AOR_Scheduled_Reports/emailRecipients.php'
@@ -143,4 +143,4 @@ $dictionary['AOR_Scheduled_Reports'] = array(
 if (!class_exists('VardefManager')) {
     require_once('include/SugarObjects/VardefManager.php');
 }
-VardefManager::createVardef('AOR_Scheduled_Reports', 'AOR_Scheduled_Reports', array('basic'));
+VardefManager::createVardef('AOR_Scheduled_Reports', 'AOR_Scheduled_Reports', ['basic', 'security_groups']);

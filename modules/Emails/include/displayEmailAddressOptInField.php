@@ -53,7 +53,6 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 function displayEmailAddressOptInField(Email $focus, $field, $value, $view)
 {
-    global $app_strings;
     $log = LoggerManager::getLogger();
 
     $addressField = 'from_name';
@@ -78,10 +77,9 @@ function displayEmailAddressOptInField(Email $focus, $field, $value, $view)
     $emailAddress = $focus->getEmailAddressFromEmailField($addressField);
     $tick = '';
     
-    if($emailAddress instanceof SugarEmailAddress) {
+    if ($emailAddress instanceof SugarEmailAddress) {
         $tick = $emailAddress->getOptInStatusTickHTML();
-    }
-    else {
+    } else {
         $log->warn('Trying to get an email field of non-Basic object');
     }
     

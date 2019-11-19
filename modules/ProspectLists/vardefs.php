@@ -57,7 +57,7 @@ $dictionary['ProspectList'] = array(
             'name' => 'name',
             'vname' => 'LBL_NAME',
             'type' => 'varchar',
-            'len' => '50',
+            'len' => '255',
             'importable' => 'required',
             'unified_search' => true,
             'full_text_search' => array('boost' => 3),
@@ -241,4 +241,3 @@ $dictionary['ProspectList'] = array(
 VardefManager::createVardef('ProspectLists', 'ProspectList', array(
     'assignable', 'security_groups',
 ));
-

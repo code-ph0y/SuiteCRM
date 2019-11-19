@@ -61,7 +61,7 @@ if (empty($GLOBALS['installing']) && !file_exists('config.php')) {
 
 $BASE_DIR = realpath(dirname(__DIR__));
 $autoloader = $BASE_DIR.'/vendor/autoload.php';
-if(file_exists($autoloader)) {
+if (file_exists($autoloader)) {
     require_once $autoloader;
 } else {
     die('Composer autoloader not found. please run "composer install"');
@@ -84,11 +84,6 @@ if (empty($GLOBALS['installing']) && empty($sugar_config['dbconfig']['db_name'])
 // make sure SugarConfig object is available
 $GLOBALS['sugar_config'] = $sugar_config;
 require_once 'include/SugarObjects/SugarConfig.php';
-
-if (!empty($sugar_config['xhprof_config'])) {
-    require_once 'include/SugarXHprof/SugarXHprof.php';
-    SugarXHprof::getInstance()->start();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 ////	DATA SECURITY MEASURES

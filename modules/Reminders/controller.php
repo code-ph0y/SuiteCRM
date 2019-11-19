@@ -42,19 +42,27 @@ if (!defined('sugarEntry') || !sugarEntry) {
  */
 
 
-class RemindersController extends SugarController {
-
-    public function action_getInviteesPersonName() {
+class RemindersController extends SugarController
+{
+    public function action_getInviteesPersonName()
+    {
         $personModules = array('Users', 'Contacts', 'Leads');
         $ret = array();
         $invitees = $_REQUEST['invitees'];
-        foreach($invitees as $invitee) {
-            if(!isset($invitee['personName']) || !$invitee['personName']) {
-                $person = BeanFactory::getBean($invitee['personModule'], $invitee['personModuleId']);
-                $invitee['personName'] = $person->name;
-            }
-            if(isset($invitee['personModule']) && $invitee['personModule'] && in_array($invitee['personModule'], $personModules) && isset($invitee['personModuleId']) && $invitee['personModuleId'] && isset($invitee['personName']) && $invitee['personName']) {
-                $ret[] = $invitee;
+        foreach ($invitees as $invitee) {
+            if ($this->isValidInvitee($invitee)) {
+                if (!isset($invitee['personName']) || !$invitee['personName']) {
+                    $person = BeanFactory::getBean($invitee['personModule'], $invitee['personModuleId']);
+                    if ($person) {
+                        $invitee['personName'] = $person->name;
+                    } else {
+                        LoggerManager::getLogger()->error('Error retriving person bean: ' . 
+                            $invitee['personModule'] . '::' . $invitee['personModuleId']);
+                    }
+                }
+                if (in_array($invitee['personModule'], $personModules) && isset($invitee['personName']) && $invitee['personName']) {
+                    $ret[] = $invitee;
+                }
             }
         }
 
@@ -62,10 +70,23 @@ class RemindersController extends SugarController {
         echo $inviteeJson;
         die();
     }
+    
+    /**
+     *
+     * @param array $invitee
+     * @return boolean
+     */
+    protected function isValidInvitee($invitee)
+    {
+        $valid = 
+            isset($invitee['personModule']) && $invitee['personModule'] &&
+            isset($invitee['personModuleId']) && $invitee['personModuleId'];
+        return $valid;
+    }
 
-    public function action_getUserPreferencesForReminders() {
+    public function action_getUserPreferencesForReminders()
+    {
         echo Reminder::loadRemindersDefaultValuesDataJson();
         die();
     }
-
 }
