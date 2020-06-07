@@ -145,12 +145,12 @@ class SugarTinyMCE
 <script type="text/javascript" language="Javascript">
 <!--
 $(document).ready(function(){
-	load_mce();
+	load_mce_{$instance}();
 });
 if (SUGAR.ajaxUI && SUGAR.ajaxUI.hist_loaded){
-    load_mce();
+    load_mce_{$instance}();
 }
-function load_mce() {
+function load_mce_{$instance}() {
     if (!SUGAR.util.isTouchScreen()) {
         if(tinyMCE.editors.length == 0 ){
             tinyMCE.init({$jsConfig});
