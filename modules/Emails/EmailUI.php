@@ -151,6 +151,7 @@ class EmailUI
         //Check quick create module access
         $QCAvailableModules = $this->_loadQuickCreateModules();
 
+
         //Get the quickSearch js needed for assigned user id on Search Tab
         require_once('include/QuickSearchDefaults.php');
         $qsd = QuickSearchDefaults::getQuickSearchDefaults();
@@ -180,6 +181,7 @@ class EmailUI
         $this->smarty->assign('qcModules', json_encode($QCAvailableModules));
         $extAllDebugValue = "ext-all.js";
         $this->smarty->assign('extFileName', $extAllDebugValue);
+        $this->smarty->assign('mail_show_name_field', true);
 
         $useRequestedRecord = false;
         if (isset($_REQUEST['record']) && $_REQUEST['record'] && $_REQUEST['record'] != $current_user->id) {

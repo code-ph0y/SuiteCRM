@@ -1,0 +1,1 @@
+console.log('mail_connection_type');

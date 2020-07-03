@@ -57,6 +57,12 @@ class OutboundEmail
         'name',
         'type',
         'user_id',
+        'mail_connection_type',
+        'mail_xoauth2user',
+        'mail_xoauth2clientid',
+        'mail_xoauth2clientsecret',
+        'mail_xoauth2type',
+        'mail_xoauth2_token',
         'mail_sendtype',
         'mail_smtptype',
         'mail_smtpserver',
@@ -76,6 +82,11 @@ class OutboundEmail
     public $name;
     public $type; // user or system
     public $user_id; // owner
+    public $mail_connection_type;
+    public $mail_xoauth2user;    
+    public $mail_xoauth2clientid;
+    public $mail_xoauth2clientsecret;
+    public $mail_xoauth2_token;
     public $mail_sendtype; // smtp
     public $mail_smtptype;
     public $mail_smtpserver;
@@ -413,6 +424,9 @@ class OutboundEmail
             $this->name = 'system';
             $this->type = 'system';
             $this->user_id = '1';
+            $this->mail_connection_type = 'smtp';
+            $this->mail_client_id = '';
+            $this->mail_client_secret = '';
             $this->mail_sendtype = 'SMTP';
             $this->mail_smtptype = 'other';
             $this->mail_smtpserver = '';

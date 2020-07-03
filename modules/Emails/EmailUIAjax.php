@@ -1327,6 +1327,7 @@ eoq;
             $oe->type = $type;
             $oe->user_id = $current_user->id;
             $oe->mail_sendtype = "SMTP";
+            $oe->mail_connection_type = $_REQUEST['mail_connection_type'];
 
             $oe->smtp_from_name = $_REQUEST['smtp_from_name'];
             $oe->smtp_from_addr = $_REQUEST['smtp_from_addr'];
@@ -1335,10 +1336,16 @@ eoq;
             $oe->mail_smtpssl = $_REQUEST['mail_smtpssl'];
             $oe->mail_smtpauth_req = isset($_REQUEST['mail_smtpauth_req']) ? 1 : 0;
             $oe->mail_smtpuser = $_REQUEST['mail_smtpuser'];
-            $oe->mail_smtpuser = $_REQUEST['mail_smtpuser'];
+            $oe->mail_xoauth2user = $_REQUEST['mail_xoauth2user'];
+            $oe->mail_xoauth2clientid = $_REQUEST['mail_xoauth2clientid'];
+            $oe->mail_xoauth2clientsecret = $_REQUEST['mail_xoauth2clientsecret'];
+            $oe->mail_xoauth2_token = $_REQUEST['mail_xoauth2_token'];
+            $oe->mail_xoauth2type = $_REQUEST['mail_xoauth2type'];
+            
             if (!empty($_REQUEST['mail_smtppass'])) {
                 $oe->mail_smtppass = $_REQUEST['mail_smtppass'];
             }
+
             $oe = $oe->save();
             echo $oe->id;
             break;
@@ -1371,7 +1378,13 @@ eoq;
                 $_REQUEST['mail_smtpuser'],
                 $pass,
                 $_REQUEST['outboundtest_from_address'],
-                $_REQUEST['outboundtest_from_address']
+                $_REQUEST['outboundtest_from_address'],
+                $_REQUEST['mail_connection_type'],
+                $_REQUEST['mail_xoauth2type'],
+                $_REQUEST['mail_xoauth2user'],
+                $_REQUEST['mail_xoauth2clientid'],
+                $_REQUEST['mail_xoauth2clientsecret'],
+                $_REQUEST['mail_xoauth2_token']
             );
 
             $out = $json->encode($out);

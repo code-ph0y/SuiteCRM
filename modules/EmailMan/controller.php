@@ -45,6 +45,7 @@ class EmailManController extends SugarController
     {
         require_once('include/OutboundEmail/OutboundEmail.php');
         require_once('modules/Configurator/Configurator.php');
+        
 
         $configurator = new Configurator();
         global $sugar_config;
@@ -55,7 +56,7 @@ class EmailManController extends SugarController
             sugar_die("Unauthorized access to administration.");
         }
 
-        //Do not allow users to spoof for sendmail if the config flag is not set.
+        // Do not allow users to spoof for sendmail if the config flag is not set.
         if (!isset($sugar_config['allow_sendmail_outbound']) || !$sugar_config['allow_sendmail_outbound']) {
             $_REQUEST['mail_sendtype'] = "SMTP";
         }
@@ -66,8 +67,6 @@ class EmailManController extends SugarController
             $oe->populateFromPost();
             $oe->saveSystem();
         }
-
-
 
         $focus = BeanFactory::newBean('Administration');
 
@@ -94,13 +93,13 @@ class EmailManController extends SugarController
 
         $focus->saveConfig();
 
-        // save User defaults for emails
         $configurator->config['email_default_delete_attachments'] = (isset($_REQUEST['email_default_delete_attachments'])) ? true : false;
         $configurator->config['email_warning_notifications'] = (isset($_REQUEST['email_warning_notifications'])) ? true : false;
         $configurator->config['email_enable_confirm_opt_in'] = isset($_REQUEST['email_enable_confirm_opt_in']) ? $_REQUEST['email_enable_confirm_opt_in'] : SugarEmailAddress::COI_STAT_DISABLED;
         $configurator->config['email_enable_auto_send_opt_in'] = (isset($_REQUEST['email_enable_auto_send_opt_in'])) ? true : false;
         $configurator->config['email_confirm_opt_in_email_template_id'] = isset($_REQUEST['email_template_id_opt_in']) ? $_REQUEST['email_template_id_opt_in'] : $configurator->config['aop']['confirm_opt_in_template_id'];
         $configurator->config['email_allow_send_as_user']  = (isset($_REQUEST['mail_allowusersend']) && $_REQUEST['mail_allowusersend'] == '1') ? true : false;
+        
         ///////////////////////////////////////////////////////////////////////////////
         ////	SECURITY
         $security = array();

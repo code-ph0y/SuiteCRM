@@ -175,8 +175,56 @@ class ViewConfig extends SugarView
         } else {
             LoggerManager::getLogger()->warn('EmailMan view display error: mail allow user send is not set for focus');
         }
-        
-        
+
+        $mailConnectionType = null;
+        if (isset($focus->settings['mail_connection_type'])) {
+            $mailConnectionType = $focus->settings['mail_connection_type'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail connection type is not set for focus');
+        }
+
+        $mailXoauth2Type = null;
+        if (isset($focus->settings['mail_xoauth2type'])) {
+            $mailXoauth2Type = $focus->settings['mail_xoauth2type'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail xoauth2 type is not set for focus');
+        }
+
+        $mailXoauth2User = null;
+        if (isset($focus->settings['mail_xoauth2user'])) {
+            $mailXoauth2User = $focus->settings['mail_xoauth2user'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail xoauth2 user is not set for focus');
+        }
+
+        $mailXoauth2ClientId = null;
+        if (isset($focus->settings['mail_xoauth2clientid'])) {
+            $mailXoauth2ClientId = $focus->settings['mail_xoauth2clientid'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail xoauth2 clientid is not set for focus');
+        }
+
+        $mailXoauth2ClientSecret = null;
+        if (isset($focus->settings['mail_xoauth2clientsecret'])) {
+            $mailXoauth2ClientSecret = $focus->settings['mail_xoauth2clientsecret'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail xoauth2 clientsecret is not set for focus');
+        }
+
+        $mailXoauth2Token = null;
+        if (isset($focus->settings['mail_xoauth2_token'])) {
+            $mailXoauth2Token = $focus->settings['mail_xoauth2_token'];
+        } else {
+            LoggerManager::getLogger()->warn('EmailMan view display error: mail mail_xoauth2_token is not set for focus');
+        }
+
+        $this->ss->assign("mail_connection_type", $mailConnectionType);
+        $this->ss->assign("mail_xoauth2type", $mailXoauth2Type);
+        $this->ss->assign("mail_xoauth2user", $mailXoauth2User);
+        $this->ss->assign("mail_xoauth2clientid", $mailXoauth2ClientId);
+        $this->ss->assign("mail_xoauth2clientsecret", $mailXoauth2ClientSecret);
+        $this->ss->assign("mail_xoauth2_token", $mailXoauth2Token);
+
         $this->ss->assign("mail_smtptype", $mailSmtpType);
         $this->ss->assign("mail_smtpserver", $mailSmtpServer);
         $this->ss->assign("mail_smtpport", $mailSmtpPort);

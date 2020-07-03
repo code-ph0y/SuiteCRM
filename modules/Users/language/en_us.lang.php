@@ -622,8 +622,8 @@ $mod_strings = array(
     'LBL_ADD_INBOUND_ACCOUNT' => 'Add',
     'LBL_ADD_OUTBOUND_ACCOUNT' => 'Add',
     'LBL_EMAIL_ACCOUNTS_INBOUND' => 'Mail Account Properties',
-    'LBL_EMAIL_SETTINGS_OUTBOUND_ACCOUNT' => 'Outgoing SMTP Mail Server',
-    'LBL_EMAIL_SETTINGS_OUTBOUND_ACCOUNTS' => 'Outgoing SMTP Mail Servers',
+    'LBL_EMAIL_SETTINGS_OUTBOUND_ACCOUNT' => 'Outgoing Mail Server',
+    'LBL_EMAIL_SETTINGS_OUTBOUND_ACCOUNTS' => 'Outgoing Mail Servers',
     'LBL_EMAIL_SETTINGS_INBOUND_ACCOUNTS' => 'Mail Accounts',
     'LBL_EMAIL_SETTINGS_INBOUND' => 'Incoming Email',
     'LBL_EMAIL_SETTINGS_OUTBOUND' => 'Outgoing Email',
@@ -682,4 +682,20 @@ $mod_strings = array(
     'ERR_USER_FACTOR_SMTP_REQUIRED' => 'SMTP server settings required first.',
     'ERR_USER_FACTOR_CHANGE_DISABLED' => 'Current user is not able to change two factor authentication settings.',
     'LNK_IMPORT_CAMPAIGNS' => 'Import Campaign',
+
+    'LBL_MAIL_NAME' => 'Mail Name:',
+    'LBL_NOTIFY_FROMNAME' => '"From" Name:',
+    'LBL_NOTIFY_FROMADDRESS' => '"From" Address:',
+    'LBL_MAIL_SMTPSERVER' => 'SMTP Mail Server:',
+    'LBL_MAIL_XOAUTH2USER' => 'Email Address',
+    'LBL_MAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_MAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_MAIL_XOAUTH2_TOKEN' => 'OAUTH2 Token: ',
+    'LBL_GMAIL_XOAUTH2USER' => 'Gmail Email Address',
+    'LBL_GMAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_GMAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+
+    'LBL_CONNECTION_TYPE_SMTP' => 'SMTP',
+    'LBL_CONNECTION_TYPE_XOAUTH2' => 'XOAUTH2',
+
 ); // END STRINGS DEFS

@@ -80,6 +80,9 @@ $mod_strings = array(
     'LBL_SEND_TEST_EMAIL' => 'Send Test Email',
 
     // for outbound email dialog
+
+    'LBL_NOTIFY_FROMADDRESS' => '"From" Address:',
+    'LBL_NOTIFY_FROMNAME' => '"From" Name:',
     'LBL_MISSING_DEFAULT_OUTBOUND_SMTP_SETTINGS' => 'The administrator has not yet configured the default outbound account. Unable to send test email.',
     'LBL_MAIL_SMTPAUTH_REQ' => 'Use SMTP Authentication?',
     'LBL_MAIL_SMTPPASS' => 'SMTP Password:',
@@ -96,6 +99,39 @@ $mod_strings = array(
     'LBL_EXCHANGE_SMTPUSER' => 'Exchange Username:',
     'LBL_EXCHANGE_SMTPPORT' => 'Exchange Server Port:',
     'LBL_EXCHANGE_SMTPSERVER' => 'Exchange Server:',
+
+    'LBL_MAIL_SMTPAUTH_REQ' => 'Use SMTP Authentication:',
+    'LBL_MAIL_SMTPPASS' => 'Password:',
+    'LBL_MAIL_SMTPPORT' => 'SMTP Port:',
+    'LBL_MAIL_SMTPSERVER' => 'SMTP Mail Server:',
+    'LBL_MAIL_SMTPUSER' => 'Username:',
+    'LBL_CHOOSE_EMAIL_PROVIDER' => 'Choose your Email provider',
+    'LBL_YAHOOMAIL_SMTPPASS' => 'Yahoo! Mail Password',
+    'LBL_YAHOOMAIL_SMTPUSER' => 'Yahoo! Mail ID',
+    'LBL_CONNECTION_TYPE' => 'Connection Type:',
+    'LBL_CONNECTION_TYPE_SMTP' => 'SMTP',
+    'LBL_CONNECTION_TYPE_XOAUTH2' => 'XOAUTH2',
+
+    'LBL_MAIL_XOAUTH2USER' => 'Email Address',
+    'LBL_MAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_MAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_MAIL_XOAUTH2_TOKEN' => 'OAUTH2 Token: ',
+
+    'LBL_GMAIL_XOAUTH2USER' => 'Gmail Email Address',
+    'LBL_GMAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_GMAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_EXCHANGE_XOAUTH2USER' => 'Exchange Email Address',
+    'LBL_EXCHANGE_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_EXCHANGE_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_GMAIL_SMTPPASS' => 'Gmail Password',
+    'LBL_GMAIL_SMTPUSER' => 'Gmail Email Address',
+    'LBL_EXCHANGE_SMTPPASS' => 'Exchange Password',
+    'LBL_EXCHANGE_SMTPUSER' => 'Exchange Username',
+    'LBL_EXCHANGE_SMTPPORT' => 'Exchange Server Port',
+    'LBL_EXCHANGE_SMTPSERVER' => 'Exchange Server',
+    'LBL_EMAIL_LINK_TYPE' => 'Email Client',
+
+
 
     'LBL_TYPE' => 'Type',
     'LBL_MAIL_SENDTYPE' => 'Mail Send Type',

@@ -1,4 +1,8 @@
 <script type="text/javascript" src="cache/include/javascript/sugar_grp_yui_widgets.js"></script>
+<div>
+    
+</div>
+
 <div id="smtpButtonGroup" class="yui-buttongroup">
     <span id="gmail" class="yui-button yui-radio-button{if $mail_smtptype == 'gmail'} yui-button-checked{/if}">
         <span class="first-child">

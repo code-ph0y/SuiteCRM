@@ -57,6 +57,11 @@ class OutboundEmailAccounts extends OutboundEmailAccounts_sugar
 
     public function save($check_notify = false)
     {
+        if (isset($_POST['notify_fromname']) && $_POST['notify_fromaddress']) {
+            $this->smtp_from_name = $_POST['notify_fromname'];
+            $this->smtp_from_addr = $_POST['notify_fromaddress'];
+        }
+
         if (!$this->mail_smtppass && $this->id) {
             $bean = BeanFactory::newBean('OutboundEmailAccounts');
             $bean->retrieve($this->id);
@@ -67,9 +72,11 @@ class OutboundEmailAccounts extends OutboundEmailAccounts_sugar
             } else {
                 $this->mail_smtppass = $bean->mail_smtppass;
             }
-        }
+		}
+
         $this->mail_smtppass = $this->mail_smtppass ? blowfishEncode(blowfishGetKey('OutBoundEmail'), $this->mail_smtppass) : null;
-        $results = parent::save($check_notify);
+		
+		$results = parent::save($check_notify);
         return $results;
     }
 

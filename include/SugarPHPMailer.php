@@ -42,8 +42,9 @@ if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
 
-require_once 'include/phpmailer/class.phpmailer.php';
-require_once 'include/phpmailer/class.smtp.php';
+use League\OAuth2\Client\Provider\Google;
+use PHPMailer\PHPMailer\PHPMailer;
+
 require_once 'include/OutboundEmail/OutboundEmail.php';
 
 /**
@@ -96,7 +97,7 @@ class SugarPHPMailer extends PHPMailer
         $this->oe = new OutboundEmail();
         $this->oe->getUserMailerSettings($current_user);
 
-        $this->setLanguage('en', 'include/phpmailer/language/');
+        $this->setLanguage('en', 'vendor/phpmailer/phpmailer/language/');
         $this->PluginDir = 'include/phpmailer/';
         $this->Mailer = 'smtp';
         // cn: i18n
@@ -134,28 +135,17 @@ class SugarPHPMailer extends PHPMailer
         global $current_user;
 
         require_once 'include/OutboundEmail/OutboundEmail.php';
-        $oe = new OutboundEmail();
-        $oe = $oe->getUserMailerSettings($current_user);
+        $outboundEmail = new OutboundEmail();
+        $outboundEmail = $outboundEmail->getUserMailerSettings($current_user);
 
         // ssl or tcp - keeping outside isSMTP b/c a default may inadvertently set ssl://
-        $this->protocol = $oe->mail_smtpssl ? 'ssl://' : 'tcp://';
+        $this->protocol = $outboundEmail->mail_smtpssl ? 'ssl://' : 'tcp://';
 
-        if ($oe->mail_sendtype === 'SMTP') {
-            //Set mail send type information
-            $this->Mailer = 'smtp';
-            $this->Host = $oe->mail_smtpserver;
-            $this->Port = $oe->mail_smtpport;
-            if ($oe->mail_smtpssl == 1) {
-                $this->SMTPSecure = 'ssl';
-            } // if
-            if ($oe->mail_smtpssl == 2) {
-                $this->SMTPSecure = 'tls';
-            } // if
-
-            if ($oe->mail_smtpauth_req) {
-                $this->SMTPAuth = true;
-                $this->Username = $oe->mail_smtpuser;
-                $this->Password = $oe->mail_smtppass;
+        if ($outboundEmail->mail_sendtype === 'SMTP') {
+            if ($outboundEmail->mail_connection_type === 'smtp') {
+                $this->setSMTPMailer($outboundEmail);
+            } elseif ($outboundEmail->mail_connection_type === 'xoauth2') {
+                $this->setOauthMailer($outboundEmail);
             }
         } else {
             $this->Mailer = 'sendmail';
@@ -168,31 +158,83 @@ class SugarPHPMailer extends PHPMailer
     public function setMailerForSystem()
     {
         require_once 'include/OutboundEmail/OutboundEmail.php';
-        $oe = new OutboundEmail();
-        $oe = $oe->getSystemMailerSettings();
+        $outboundEmail = new OutboundEmail();
+        $outboundEmail = $outboundEmail->getSystemMailerSettings();
 
         // ssl or tcp - keeping outside isSMTP b/c a default may inadvertantly set ssl://
-        $this->protocol = $oe->mail_smtpssl ? 'ssl://' : 'tcp://';
+        $this->protocol = $outboundEmail->mail_smtpssl ? 'ssl://' : 'tcp://';
 
-        if ($oe->mail_sendtype === 'SMTP') {
-            //Set mail send type information
-            $this->Mailer = 'smtp';
-            $this->Host = $oe->mail_smtpserver;
-            $this->Port = $oe->mail_smtpport;
-            if ($oe->mail_smtpssl == 1) {
-                $this->SMTPSecure = 'ssl';
-            } // if
-            if ($oe->mail_smtpssl == 2) {
-                $this->SMTPSecure = 'tls';
-            } // if
-            if ($oe->mail_smtpauth_req) {
-                $this->SMTPAuth = true;
-                $this->Username = $oe->mail_smtpuser;
-                $this->Password = $oe->mail_smtppass;
+        if ($outboundEmail->mail_sendtype === 'SMTP') {
+            if ($outboundEmail->mail_connection_type === 'smtp') {
+                $this->setSMTPMailer($outboundEmail);
+            } elseif ($outboundEmail->mail_connection_type === 'xoauth2') {
+                $this->setOauthMailer($outboundEmail);
             }
         } else {
             $this->Mailer = 'sendmail';
         }
+    }
+
+    /**
+     * @param $outboundEmail
+     */
+    protected function setSMTPMailer($outboundEmail)
+    {
+        //Set mail send type information
+        $this->Mailer = 'smtp';
+        $this->Host = $outboundEmail->mail_smtpserver;
+        $this->Port = $outboundEmail->mail_smtpport;
+        if ($outboundEmail->mail_smtpssl == 1) {
+            $this->SMTPSecure = 'ssl';
+        } // if
+        if ($outboundEmail->mail_smtpssl == 2) {
+            $this->SMTPSecure = 'tls';
+        } // if
+        if ($outboundEmail->mail_smtpauth_req) {
+            $this->SMTPAuth = true;
+            $this->Username = $outboundEmail->mail_smtpuser;
+            $this->Password = $outboundEmail->mail_smtppass;
+        }
+    }
+
+    /**
+     * @param $outboundEmail
+     */
+    protected function setOauthMailer($outboundEmail)
+    {
+        $host = '';
+        switch ($outboundEmail->mail_xoauth2type) {
+            case 'gmail':
+                $host = 'smtp.gmail.com';
+                break;
+            default:
+                throw new RuntimeException('Unsupported XOAuth2 Email provider: ' . $outboundEmail->mail_xoauth2type);
+        }
+        $this->isSMTP();
+        $this->SMTPAuth = true;
+        $this->AuthType = 'XOAUTH2';
+        $this->Host = $host;
+        $this->Port = 587;
+        $this->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+        $provider = new Google(
+            [
+                'clientId' => $outboundEmail->mail_xoauth2clientid,
+                'clientSecret' => $outboundEmail->mail_xoauth2clientsecret,
+            ]
+        );
+
+        $this->setOAuth(
+            new \PHPMailer\PHPMailer\OAuth(
+                [
+                    'provider' => $provider,
+                    'clientId' => $outboundEmail->mail_xoauth2clientid,
+                    'clientSecret' => $outboundEmail->mail_xoauth2clientsecret,
+                    'refreshToken' => $outboundEmail->mail_xoauth2_token,
+                    'userName' => $outboundEmail->mail_xoauth2user,
+                ]
+            )
+        );
     }
 
     /**

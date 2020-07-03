@@ -73,41 +73,27 @@ array(
               {/if}',
           )
         ),
-        1 =>
-          array(
-            0 =>
-            array(
-              'name' => 'mail_smtpuser',
-              'label' => 'LBL_USERNAME',
-            ),
-          ),
-        2 =>
-        array(
+        1 => array(
           0 =>
           array(
-            'name' => 'mail_smtpserver',
-            'label' => 'LBL_SMTP_SERVERNAME',
-          ),
-          1 =>
-          array(
-            'name' => 'mail_smtpport',
-            'label' => 'LBL_SMTP_PORT',
+            'name' => 'mail_xoauth2user',
+            'label' => 'LBL_MAIL_XOAUTH2USER',
           ),
         ),
-        3 =>
-        array(
+        2 => array(
           0 =>
           array(
-            'name' => 'mail_smtpauth_req',
-            'label' => 'LBL_SMTP_AUTH',
-          ),
-          1 =>
-          array(
-            'name' => 'mail_smtpssl',
-            'studio' => 'visible',
-            'label' => 'LBL_SMTP_PROTOCOL',
+            'name' => 'mail_xoauth2clientid',
+            'label' => 'LBL_MAIL_XOAUTH2CLIENTID',
           ),
         ),
+        3 => array(
+          0 =>
+          array(
+            'name' => 'mail_xoauth2clientsecret',
+            'label' => 'LBL_MAIL_XOAUTH2CLIENTSECRET',
+          ),
+        )
       ),
     ),
   ),

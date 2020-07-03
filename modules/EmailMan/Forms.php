@@ -64,9 +64,13 @@ function get_validate_record_js()
     $err_from_name = $mod_strings['LBL_LIST_FROM_NAME'];
     $err_from_addr = $app_strings['LBL_EMAIL_SETTINGS_FROM_ADDR'];
     $err_smtpport = $mod_strings['LBL_MAIL_SMTPPORT'];
-    $err_mailserver = $mod_strings['LBL_MAIL_SMTPSERVER'];
+	$err_mailserver = $mod_strings['LBL_MAIL_SMTPSERVER'];
     $err_smtpuser = $mod_strings['LBL_MAIL_SMTPUSER'];
-    $err_smtppass = $mod_strings['LBL_MAIL_SMTPPASS'];
+	$err_smtppass = $mod_strings['LBL_MAIL_SMTPPASS'];
+	
+	$err_xoauth2user = $mod_strings['LBL_MAIL_XOAUTH2USER'];
+	$err_xoauth2clientid = $mod_strings['LBL_MAIL_XOAUTH2CLIENTID'];
+	$err_xoauth2clientsecret = $mod_strings['LBL_MAIL_XOAUTH2CLIENTSECRET'];
 
     $the_script  = <<<EOQ
 
@@ -74,6 +78,7 @@ function get_validate_record_js()
 <!--  to hide script contents from old browsers
 
 function verify_data(button) {
+	
 	var isError = false;
 	var errorMessage = "";
 	if (typeof button.form['campaign_emails_per_run'] != 'undefined' && trim(button.form['campaign_emails_per_run'].value) == "") {
@@ -86,14 +91,22 @@ function verify_data(button) {
 			errorMessage += "\\n$err_int_only";
 		}
 	}
+
 	if (typeof button.form['tracking_entities_location_type'] != 'undefined' && button.form['tracking_entities_location_type'][1].checked == true) {
 		if (typeof button.form['tracking_entities_location'] != 'undefined' && trim(button.form['tracking_entities_location'].value) == "") {
 			isError = true;
 			errorMessage += "\\n$lbl_location";
 		}
 	}
+	
 	if (typeof document.forms['ConfigureSettings'] != 'undefined') {
-        var fromname = document.getElementById('notify_fromname').value;
+
+		var connectionType = document.querySelector("input[name='mail_connection_type']:checked").value;
+		var xoauth2User = document.getElementById('mail_xoauth2user').value;
+		var xoauth2ClientId = document.getElementById("mail_xoauth2clientid").value;
+		var xoauth2ClientSecret = document.getElementById("mail_xoauth2clientsecret").value;
+
+		var fromname = document.getElementById('notify_fromname').value;
         var fromAddress = document.getElementById('notify_fromaddress').value;
         var sendType = document.getElementById('mail_sendtype').value;
         var smtpPort = document.getElementById('mail_smtpport').value;
@@ -109,23 +122,40 @@ function verify_data(button) {
 			errorMessage += "\\n$err_from_addr";
         }
 
-        if (sendType == 'SMTP') {
-	        if(trim(smtpserver) == "") {
-				isError = true;
-				errorMessage += "\\n$err_mailserver";
-	        }
-	        if(trim(smtpPort) == "") {
-				isError = true;
-				errorMessage += "\\n$err_smtpport";
-	        }
-	        if (mailsmtpauthreq.checked) {
-		        if(trim(document.getElementById('mail_smtpuser').value) == "") {
+		if (connectionType == 'smtp') {
+			if (sendType == 'SMTP') {
+				if(trim(smtpserver) == "") {
 					isError = true;
-					errorMessage += "\\n$err_smtpuser";
-		        }
-	        }
+					errorMessage += "\\n$err_mailserver";
+				}
+				if(trim(smtpPort) == "") {
+					isError = true;
+					errorMessage += "\\n$err_smtpport";
+				}
+				if (mailsmtpauthreq.checked) {
+					if(trim(document.getElementById('mail_smtpuser').value) == "") {
+						isError = true;
+						errorMessage += "\\n$err_smtpuser";
+					}
+				}
 
-        } // if
+			} // if
+		} else if (connectionType == 'xoauth2') {
+			if (trim(xoauth2User) == "") {
+				isError = true;
+				errorMessage += "\\n$err_xoauth2user";
+			}
+			
+			if (trim(xoauth2ClientId) == "") {
+				isError = true;
+				errorMessage += "\\n$err_xoauth2clientid";
+			}
+
+			if (trim(xoauth2ClientSecret) == "") {
+				isError = true;
+				errorMessage += "\\n$err_xoauth2clientsecret";
+			}	
+		}
 	} // if
 
 	// Here we decide whether to submit the form.
@@ -142,13 +172,23 @@ function add_checks(f) {
 	removeFromValidate('ConfigureSettings', 'mail_smtpuser');
 	removeFromValidate('ConfigureSettings', 'mail_smtppass');
 
-	if (f.mail_sendtype.value == "SMTP") {
-		addToValidate('ConfigureSettings', 'mail_smtpserver', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPSERVER']}');
-		addToValidate('ConfigureSettings', 'mail_smtpport', 'int', 'true', '{$mod_strings['LBL_MAIL_SMTPPORT']}');
-		if (f.mail_smtpauth_req.checked) {
-			addToValidate('ConfigureSettings', 'mail_smtpuser', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPUSER']}');
-			addToValidate('ConfigureSettings', 'mail_smtppass', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPPASS']}');
+	removeFromValidate('ConfigureSettings', 'mail_xoauth2user');
+	removeFromValidate('ConfigureSettings', 'mail_xoauth2clientid');
+	removeFromValidate('ConfigureSettings', 'mail_xoauth2clientsecret');
+
+	if (f.mail_connection_type.value == 'smtp') {
+		if (f.mail_sendtype.value == "SMTP") {
+			addToValidate('ConfigureSettings', 'mail_smtpserver', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPSERVER']}');
+			addToValidate('ConfigureSettings', 'mail_smtpport', 'int', 'true', '{$mod_strings['LBL_MAIL_SMTPPORT']}');
+			if (f.mail_smtpauth_req.checked) {
+				addToValidate('ConfigureSettings', 'mail_smtpuser', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPUSER']}');
+				addToValidate('ConfigureSettings', 'mail_smtppass', 'varchar', 'true', '{$mod_strings['LBL_MAIL_SMTPPASS']}');
+			}
 		}
+	} else {
+		addToValidate('ConfigureSettings', 'mail_xoauth2user', 'varchar', 'true', '{$mod_strings['LBL_MAIL_XOAUTH2USER']}');
+		addToValidate('ConfigureSettings', 'mail_xoauth2clientid', 'varchar', 'true', '{$mod_strings['LBL_MAIL_XOAUTH2CLIENTID']}');
+		addToValidate('ConfigureSettings', 'mail_xoauth2clientsecret', 'varchar', 'true', '{$mod_strings['LBL_MAIL_XOAUTH2CLIENTSECRET']}');
 	}
 
 	return true;

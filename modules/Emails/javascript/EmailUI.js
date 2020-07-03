@@ -380,7 +380,7 @@
         this.outboundDialog = new YAHOO.widget.Dialog("outboundDialog", {
           modal: true,
           visible: true,
-          fixedcenter: true,
+          fixedcenter: false,
           constraintoviewport: true,
           width: "750px",
           shadow: true
@@ -400,32 +400,7 @@
         Dom.removeClass("outboundDialog", "yui-hidden");
       } // end lazy load
 
-      // clear out form
-      var form = document.getElementById('outboundEmailForm');
-      for (i = 0; i < form.elements.length; i++) {
-        if (form.elements[i].name == 'mail_smtpport') {
-          form.elements[i].value = 25;
-        } else if (form.elements[i].type != 'button' && form.elements[i].type != 'checkbox') {
-          form.elements[i].value = '';
-        } else if (form.elements[i].type == 'checkbox') {
-          form.elements[i].checked = false;
-        }
-      }
-      //Render the SMTP buttons
-      if (!SUGAR.smtpButtonGroup) {
-        SUGAR.smtpButtonGroup = new YAHOO.widget.ButtonGroup("smtpButtonGroup");
-        SUGAR.smtpButtonGroup.subscribe('checkedButtonChange', function (e) {
-          SUGAR.email2.accounts.changeEmailScreenDisplay(e.newValue.get('value'));
-          document.getElementById('smtp_settings').style.display = '';
-          form.mail_smtptype.value = e.newValue.get('value');
-        });
-        YAHOO.widget.Button.addHiddenFieldsToForm(form);
-      }
-      //Hide Username/Password
-      SUGAR.email2.accounts.smtp_authenticate_field_display();
-      //Unset readonly fields
-      SUGAR.email2.accounts.toggleOutboundAccountDisabledFields(false);
-      SUGAR.email2.accounts.changeEmailScreenDisplay('other');
+      document.getElementById('outboundEmailDoneButton').style.display = 'block';
       this.outboundDialog.render();
       this.outboundDialog.show();
     },
@@ -778,27 +753,56 @@
       var errorMessage = '';
       var isError = false;
       if (typeof document.forms['outboundEmailForm'] != 'undefined') {
-        var mailName = document.getElementById('mail_name').value;
-        var smtpServer = document.getElementById('mail_smtpserver').value;
-        var smtpPort = document.getElementById('mail_smtpport').value;
+        var authType = document.querySelector('input[name=mail_connection_type]:checked').value;
 
-        var mailsmtpauthreq = document.getElementById('mail_smtpauth_req');
-        if (trim(mailName) == '') {
-          isError = true;
-          errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_NAME + "<br/>";
-        }
-        if (trim(smtpServer) == '') {
-          isError = true;
-          errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPSERVER + "<br/>";
-        }
-        if (trim(smtpPort) == '') {
-          isError = true;
-          errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPPORT + "<br/>";
-        }
-        if (mailsmtpauthreq.checked) {
-          if (trim(document.getElementById('mail_smtpuser').value) == '') {
+        if (authType === 'xoauth2') {
+          var mail_xoauth2user = document.getElementById('mail_xoauth2user').value;
+          var mail_xoauth2clientid = document.getElementById('mail_xoauth2clientid').value;
+          var xoauth2_clientsecret = document.getElementById('xoauth2_clientsecret').value;
+          var mail_xoauth2_token = document.getElementById('mail_xoauth2_token').value;
+
+          if (trim(mail_xoauth2user) == '') {
             isError = true;
-            errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPUSER + "<br/>";
+            errorMessage += app_strings.LBL_MAIL_XOAUTH2USER + "<br/>";
+          }
+          if (trim(mail_xoauth2clientid) == '') {
+            isError = true;
+            errorMessage += app_strings.LBL_MAIL_XOAUTH2CLIENTID + "<br/>";
+          }
+          if (trim(xoauth2_clientsecret) == '') {
+            isError = true;
+            errorMessage += app_strings.LBL_MAIL_XOAUTH2CLIENTSECRET + "<br/>";
+          }
+
+          if (trim(mail_xoauth2_token) == '') {
+            isError = true;
+            errorMessage += app_strings.LBL_MAIL_XOAUTH2CLIENTTOKEN + "<br/>";
+          }
+        }
+        if (authType === 'smtp') {
+          var mailName = document.getElementById('mail_name').value;
+          var smtpServer = document.getElementById('mail_smtpserver').value;
+          var smtpPort = document.getElementById('mail_smtpport').value;
+
+          var mailsmtpauthreq = document.getElementById('mail_smtpauth_req');
+
+          // if (trim(mailName) == '') {
+          //   isError = true;
+          //   errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_NAME + "<br/>";
+          // }
+          if (trim(smtpServer) == '') {
+            isError = true;
+            errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPSERVER + "<br/>";
+          }
+          if (trim(smtpPort) == '') {
+            isError = true;
+            errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPPORT + "<br/>";
+          }
+          if (mailsmtpauthreq.checked) {
+            if (trim(document.getElementById('mail_smtpuser').value) == '') {
+              isError = true;
+              errorMessage += app_strings.LBL_EMAIL_ACCOUNTS_SMTPUSER + "<br/>";
+            }
           }
         }
       }
@@ -813,7 +817,10 @@
     testOutboundSettings: function () {
       var errorMessage = '';
       var isError = false;
-      var fromAddress = document.getElementById("outboundtest_from_address").value;
+
+      var toAddress = document.getElementById("outboundtest_from_address").value;
+      var fromAddress = document.getElementById("notify_fromaddress").value;
+
       if (trim(fromAddress) == "") {
         errorMessage += app_strings.LBL_EMAIL_SETTINGS_FROM_TO_EMAIL_ADDR + "<br/>";
         SUGAR.showMessageBox(mod_strings.ERR_MISSING_REQUIRED_FIELDS, errorMessage, 'alert');
@@ -828,7 +835,11 @@
 
       //Hide the dialogue and show an in progress indicator.
       SE.accounts.testOutboundDialog.hide();
-      SUGAR.showMessageBox(app_strings.LBL_EMAIL_PERFORMING_TASK, app_strings.LBL_EMAIL_ONE_MOMENT, 'plain');
+      SUGAR.showMessageBox(
+        app_strings.LBL_EMAIL_PERFORMING_TASK, 
+        app_strings.LBL_EMAIL_ONE_MOMENT, 
+        'plain'
+      );
 
       //If the outbound mail type is a system override we need to re-enable the post fields otherwise
       //nothing is sent in the request.
@@ -839,8 +850,66 @@
       if (outboundType == 'system-override')
         SUGAR.email2.accounts.toggleOutboundAccountDisabledFields(true);
 
-      var data = "&emailUIAction=testOutbound&outboundtest_from_address=" + fromAddress;
-      AjaxObject.startRequest(callbackOutboundTest, urlStandard + data);
+      var callbackOutboundTest = {
+        success	: function(o) {
+          hideOverlay();
+          var responseObject = YAHOO.lang.JSON.parse(o.responseText);
+          if (responseObject.status) {
+            overlay(
+              app_strings.LBL_EMAIL_TEST_OUTBOUND_SETTINGS, 
+              app_strings.LBL_EMAIL_TEST_NOTIFICATION_SENT, 
+              'alert'
+            );
+          } else {
+            overlay(
+              app_strings.LBL_EMAIL_TEST_OUTBOUND_SETTINGS, 
+              responseObject.errorMessage, 
+              'alert'
+            );
+          }
+        }
+      };
+  
+      var smtpServer = document.getElementById('mail_smtpserver').value;
+      var smtpPort = document.getElementById('mail_smtpport').value;
+      var smtpssl  = document.getElementById('mail_smtpssl').value;
+      var mailsmtpauthreq = document.getElementById('mail_smtpauth_req');
+      var mail_sendtype = document.getElementById('mail_sendtype').value;
+      var from_name = document.getElementById('notify_fromname').value;
+      var mail_connection_type  = document.querySelector('input[name=mail_connection_type]:checked').value;
+      var mail_xoauth2type  = document.querySelector('input[name=mail_xoauth2type]:checked').value;
+      var mail_xoauth2user  = document.getElementById('mail_xoauth2user').value;
+      var mail_xoauth2clientid  = document.getElementById('mail_xoauth2clientid').value;
+      var mail_xoauth2clientsecret  = document.getElementById('mail_xoauth2clientsecret').value;
+      var mail_xoauth2_token  = document.getElementById('mail_xoauth2_token').value;
+  
+      var postDataString = 'mail_type=user&mail_sendtype=' + mail_sendtype
+        + '&mail_smtpserver=' + smtpServer
+        + "&mail_smtpport=" + smtpPort
+        + "&mail_smtpssl=" + smtpssl
+        + "&mail_smtpauth_req=" + mailsmtpauthreq.checked
+        + "&mail_smtpuser=" + trim(document.getElementById('mail_smtpuser').value)
+        + "&mail_smtppass=" + trim(document.getElementById('mail_smtppass').value)
+        + "&outboundtest_to_address=" + encodeURIComponent(toAddress)
+        + "&outboundtest_from_address=" + fromAddress
+        + "&mail_connection_type=" + mail_connection_type
+        + "&mail_xoauth2type=" + mail_xoauth2type
+        + "&mail_xoauth2user=" + mail_xoauth2user
+        + "&mail_xoauth2clientid=" + mail_xoauth2clientid
+        + "&mail_xoauth2clientsecret=" + mail_xoauth2clientsecret
+        + "&mail_xoauth2_token=" + mail_xoauth2_token
+        + "&mail_from_name=" + from_name;
+  
+      YAHOO.util.Connect.asyncRequest(
+        "POST", 
+        "index.php?action=testOutboundEmail&module=EmailMan&to_pdf=true&sugar_body_only=true", 
+        callbackOutboundTest, 
+        postDataString
+      );
+
+
+      // var data = "&emailUIAction=testOutbound&outboundtest_from_address=" + fromAddress;
+      // AjaxObject.startRequest(callbackOutboundTest, urlStandard + data);
 
     },
 
@@ -3455,6 +3524,7 @@
 
       SE.settings.settingsDialog.show();
       SE.folders.lazyLoadSettings(user);
+
       SE.accounts.lazyLoad(user);
       $(window).scrollLeft(0);
     },

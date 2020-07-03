@@ -97,4 +97,5 @@ $entry_point_registry = array(
     'surveyThanks' => array('file' => 'modules/Surveys/Entry/Thanks.php', 'auth' => false),
     'sendConfirmOptInEmail' => array('file' => 'include/entryPointConfirmOptInConnector.php', 'auth' => true),
     'setImapTestSettings' => ['file' => 'include/Imap/ImapTestSettingsEntry.php', 'auth' => true],
+    'emailXOauth2' => ['file' => 'include/OutboundEmail/get_oauth_token.php', 'auth' => true],
 );

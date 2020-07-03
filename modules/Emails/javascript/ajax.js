@@ -37,7 +37,6 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
-
 if (typeof console == "undefined")
   console = {
     log: function (o) {
@@ -485,34 +484,58 @@ AjaxObject.accounts = {
   callbackEditOutbound: {
     success: function (o) {
       var ret = YAHOO.lang.JSON.parse(o.responseText);
-      // show overlay
-      SUGAR.email2.accounts.showAddSmtp();
+      
+      setTimeout(() => {
+        // show overlay
+        SUGAR.email2.accounts.showAddSmtp();
+        
+        changeConnectionType(ret.mail_connection_type);
 
-      // fill values
-      document.getElementById("mail_id").value = ret.id;
-      document.getElementById("type").value = ret.type;
-      document.getElementById("smtp_from_name").value = ret.smtp_from_name;
-      document.getElementById("smtp_from_addr").value = ret.smtp_from_addr;
-      document.getElementById("mail_sendtype").value = ret.mail_sendtype;
-      document.getElementById("mail_name").value = ret.name;
-      document.getElementById("mail_smtpserver").value = ret.mail_smtpserver;
-      document.getElementById("outboundEmailForm").mail_smtptype.value = ret.mail_smtptype;
-      document.getElementById("mail_smtpport").value = ret.mail_smtpport;
-      document.getElementById("mail_smtpuser").value = ret.mail_smtpuser;
-      document.getElementById("mail_smtpauth_req").checked = (ret.mail_smtpauth_req == 1) ? true : false;
-      SUGAR.email2.accounts.smtp_authenticate_field_display();
-      document.getElementById("mail_smtpssl").options[ret.mail_smtpssl].selected = true;
+        // fill values
+        document.getElementById("mail_id").value = ret.id;
+        document.getElementById("smtp_from_name").value = ret.smtp_from_name;
+        document.getElementById("smtp_from_addr").value = ret.smtp_from_addr;
+        document.getElementById("mail_sendtype").value = ret.mail_sendtype;
+        document.getElementById("mail_name").value = ret.name;
+        document.getElementById("mail_smtpserver").value = ret.mail_smtpserver;
+        document.getElementById("outboundEmailForm").mail_smtptype.value = ret.mail_smtptype;
+        document.getElementById("mail_smtpport").value = ret.mail_smtpport;
+        document.getElementById("mail_smtpuser").value = ret.mail_smtpuser;
+        document.getElementById("mail_smtpauth_req").checked = (ret.mail_smtpauth_req == 1) ? true : false;
+        document.getElementById("mail_xoauth2user").value = ret.mail_xoauth2user;
+        document.getElementById("mail_xoauth2clientid").value = ret.mail_xoauth2clientid;
+        document.getElementById("mail_xoauth2clientsecret").value = ret.mail_xoauth2clientsecret;
+        document.getElementById("mail_xoauth2_token").value = ret.mail_xoauth2_token;
 
-      if (ret.type == 'system-override') {
-        SUGAR.email2.accounts.toggleOutboundAccountDisabledFields(true);
-        SUGAR.email2.accounts.changeEmailScreenDisplay(ret.mail_smtptype, true);
-      }
-      else {
-        SUGAR.email2.accounts.toggleOutboundAccountDisabledFields(false);
-        SUGAR.email2.accounts.changeEmailScreenDisplay(ret.mail_smtptype, false);
-      }
-      SUGAR.util.setEmailPasswordDisplay('mail_smtppass', ret.has_password);
+        if (ret.mail_xoauth2_token) {
+          document.getElementById("xoauth2_authenticate_success").style.display = '';
+        }
 
+        if (ret.mail_connection_type === 'smtp') {
+          document.getElementById('mail_connection_type_smtp').checked = true;
+        }
+
+        if (ret.mail_connection_type === 'xoauth2') {
+          document.getElementById('mail_connection_type_xoauth2').checked = true;
+          if (ret.mail_xoauth2type == 'gmail') {
+            document.getElementById('mail_xoauth2type_gmail').checked = true;
+          } else if (ret.mail_xoauth2type  == 'other') {
+            document.getElementById('mail_xoauth2type_other').checked = true;
+          }
+        }
+
+        SUGAR.email2.accounts.smtp_authenticate_field_display();
+        document.getElementById("mail_smtpssl").options[ret.mail_smtpssl].selected = true;
+
+        SUGAR.util.setEmailPasswordDisplay('mail_smtppass', ret.has_password);
+        
+        if (document.getElementById("type").value == 'user') {
+          document.getElementById("testOutboundEmail").setAttribute(
+            "onclick",
+            "javascript:SUGAR.email2.accounts.testOutboundSettingsDialog()"
+          );
+        }
+      }, 500);
     },
     failure: AjaxObject.handleFailure,
     timeout: AjaxObject.timeout,

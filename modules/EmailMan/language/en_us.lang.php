@@ -85,6 +85,21 @@ $mod_strings = array(
     'LBL_CHOOSE_EMAIL_PROVIDER' => 'Choose your Email provider',
     'LBL_YAHOOMAIL_SMTPPASS' => 'Yahoo! Mail Password',
     'LBL_YAHOOMAIL_SMTPUSER' => 'Yahoo! Mail ID',
+    'LBL_CONNECTION_TYPE' => 'Connection Type:',
+    'LBL_CONNECTION_TYPE_SMTP' => 'SMTP',
+    'LBL_CONNECTION_TYPE_XOAUTH2' => 'XOAUTH2',
+
+    'LBL_MAIL_XOAUTH2USER' => 'Email Address',
+    'LBL_MAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_MAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_MAIL_XOAUTH2CLIENTTOKEN' => 'OAUTH2 Client Token: ',
+
+    'LBL_GMAIL_XOAUTH2USER' => 'Gmail Email Address',
+    'LBL_GMAIL_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_GMAIL_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
+    'LBL_EXCHANGE_XOAUTH2USER' => 'Exchange Email Address',
+    'LBL_EXCHANGE_XOAUTH2CLIENTID' => 'OAUTH2 Client ID: ',
+    'LBL_EXCHANGE_XOAUTH2CLIENTSECRET' => 'OAUTH2 Client Secret: ',
     'LBL_GMAIL_SMTPPASS' => 'Gmail Password',
     'LBL_GMAIL_SMTPUSER' => 'Gmail Email Address',
     'LBL_EXCHANGE_SMTPPASS' => 'Exchange Password',
@@ -140,4 +155,7 @@ $mod_strings = array(
     'LBL_OUTBOUND_EMAIL_ACCOUNT_VIEW' => 'View Outbound Email Accounts',
     'LBL_ALLOW_SEND_AS_USER' => 'Users may send as themselves:',
     'LBL_ALLOW_SEND_AS_USER_DESC' => 'When enabled, <b>all</b> users can send email using the outgoing mail server, using their own primary email address as the &quot;From:&quot; address.<br>This feature might not work with SMTP servers that do not allow sending from a different email account than the server account.',
+
+    'LBL_EMAIL_TEST_NOTIFICATION_SENT' => 'An email was sent to the specified email address using the provided outgoing mail settings. Please check to see if the email was received to verify the settings are correct.',
+    'LBL_EMAIL_TEST_OUTBOUND_SETTINGS' => 'Send Test Email',
 );

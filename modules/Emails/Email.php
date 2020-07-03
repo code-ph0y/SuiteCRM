@@ -38,6 +38,9 @@
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
+use League\OAuth2\Client\Provider\Google;
+use PHPMailer\PHPMailer\PHPMailer;
+
 if (!defined('sugarEntry') || !sugarEntry) {
     die('Not A Valid Entry Point');
 }
@@ -809,9 +812,12 @@ class Email extends Basic
      * @param $toaddress
      * @param string $mail_sendtype
      * @param string $fromname
-     * @global $current_user
-     * @global $app_strings
+     * @param string $connectionType
+     * @param string $oauthClientId
+     * @param string $oauthSecret
+     * @param string $oauthToken
      * @return array
+     * @throws \PHPMailer\PHPMailer\Exception
      */
     public function sendEmailTest(
         $mailserver_url,
@@ -823,30 +829,72 @@ class Email extends Basic
         $fromaddress,
         $toaddress,
         $mail_sendtype = 'smtp',
-        $fromname = ''
+        $fromname = '',
+        $connectionType = 'SMTP',
+        $oauthType = '',
+        $oauthUser = '',
+        $oauthClientId = '',
+        $oauthSecret = '',
+        $oauthToken = ''
     ) {
         global $current_user, $app_strings;
         $mod_strings = return_module_language($GLOBALS['current_language'], 'Emails'); //Called from EmailMan as well.
         $mail = new SugarPHPMailer(true);
         $mail->Mailer = strtolower($mail_sendtype);
         if ($mail->Mailer == 'smtp') {
-            $mail->Host = $mailserver_url;
-            $mail->Port = $port;
-            if (isset($ssltls) && !empty($ssltls)) {
-                $mail->protocol = "ssl://";
-                if ($ssltls == 1) {
-                    $mail->SMTPSecure = 'ssl';
-                } // if
-                if ($ssltls == 2) {
-                    $mail->SMTPSecure = 'tls';
-                } // if
-            } else {
-                $mail->protocol = "tcp://";
-            }
-            if ($smtp_auth_req) {
+            if ($connectionType === 'smtp') {
+                $mail->Host = $mailserver_url;
+                $mail->Port = $port;
+                if (isset($ssltls) && !empty($ssltls)) {
+                    $mail->protocol = "ssl://";
+                    if ($ssltls == 1) {
+                        $mail->SMTPSecure = 'ssl';
+                    } // if
+                    if ($ssltls == 2) {
+                        $mail->SMTPSecure = 'tls';
+                    } // if
+                } else {
+                    $mail->protocol = "tcp://";
+                }
+                if ($smtp_auth_req) {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $smtp_username;
+                    $mail->Password = $smtppassword;
+                }
+            } elseif ($connectionType === 'xoauth2') {
+                $host = '';
+                switch ($oauthType) {
+                    case 'gmail':
+                        $host = 'smtp.gmail.com';
+                        break;
+                    default:
+                        throw new RuntimeException('Unsupported XOAuth2 Email provider: ' . $outboundEmail->mail_xoauth2type);
+                }
+                $mail->isSMTP();
                 $mail->SMTPAuth = true;
-                $mail->Username = $smtp_username;
-                $mail->Password = $smtppassword;
+                $mail->AuthType = 'XOAUTH2';
+                $mail->Host = $host;
+                $mail->Port = 587;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+                $provider = new Google(
+                    [
+                        'clientId' => $oauthClientId,
+                        'clientSecret' => $oauthSecret,
+                    ]
+                );
+
+                $mail->setOAuth(
+                    new \PHPMailer\PHPMailer\OAuth(
+                        [
+                            'provider' => $provider,
+                            'clientId' => $oauthClientId,
+                            'clientSecret' => $oauthSecret,
+                            'refreshToken' => $oauthToken,
+                            'userName' => $oauthUser,
+                        ]
+                    )
+                );
             }
         } else {
             $mail->Mailer = 'sendmail';
@@ -2798,21 +2846,58 @@ class Email extends Basic
         // ssl or tcp - keeping outside isSMTP b/c a default may inadvertantly set ssl://
         $mail->protocol = ($oe->mail_smtpssl) ? "ssl://" : "tcp://";
         if ($oe->mail_sendtype == "SMTP") {
-            //Set mail send type information
-            $mail->Mailer = "smtp";
-            $mail->Host = $oe->mail_smtpserver;
-            $mail->Port = $oe->mail_smtpport;
-            if ($oe->mail_smtpssl == 1) {
-                $mail->SMTPSecure = 'ssl';
-            } // if
-            if ($oe->mail_smtpssl == 2) {
-                $mail->SMTPSecure = 'tls';
-            } // if
 
-            if ($oe->mail_smtpauth_req) {
+            if ($oe->mail_connection_type === 'smtp') {
+                //Set mail send type information
+                $mail->Mailer = "smtp";
+                $mail->Host = $oe->mail_smtpserver;
+                $mail->Port = $oe->mail_smtpport;
+                if ($oe->mail_smtpssl == 1) {
+                    $mail->SMTPSecure = 'ssl';
+                } // if
+                if ($oe->mail_smtpssl == 2) {
+                    $mail->SMTPSecure = 'tls';
+                } // if
+
+                if ($oe->mail_smtpauth_req) {
+                    $mail->SMTPAuth = true;
+                    $mail->Username = $oe->mail_smtpuser;
+                    $mail->Password = $oe->mail_smtppass;
+                }
+            } elseif ($oe->mail_connection_type === 'xoauth2') {
+                $host = '';
+                switch ($oe->mail_xoauth2type) {
+                    case 'gmail':
+                        $host = 'smtp.gmail.com';
+                        break;
+                    default:
+                        throw new RuntimeException('Unsupported XOAuth2 Email provider: ' . $outboundEmail->mail_xoauth2type);
+                }
+                $mail->isSMTP();
                 $mail->SMTPAuth = true;
-                $mail->Username = $oe->mail_smtpuser;
-                $mail->Password = $oe->mail_smtppass;
+                $mail->AuthType = 'XOAUTH2';
+                $mail->Host = $host;
+                $mail->Port = 587;
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        
+                $provider = new Google(
+                    [
+                        'clientId' => $oe->mail_xoauth2clientid,
+                        'clientSecret' => $oe->mail_xoauth2clientsecret,
+                    ]
+                );
+        
+                $mail->setOAuth(
+                    new \PHPMailer\PHPMailer\OAuth(
+                        [
+                            'provider' => $provider,
+                            'clientId' => $oe->mail_xoauth2clientid,
+                            'clientSecret' => $oe->mail_xoauth2clientsecret,
+                            'refreshToken' => $oe->mail_xoauth2_token,
+                            'userName' => $oe->mail_xoauth2user,
+                        ]
+                    )
+                );
             }
         } else {
             $mail->Mailer = "sendmail";

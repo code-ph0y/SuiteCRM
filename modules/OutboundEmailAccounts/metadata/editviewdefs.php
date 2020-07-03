@@ -35,85 +35,21 @@ $viewdefs [$module_name] =
                                     ),
                             ),
                         'syncDetailEditViews' => true,
+                        'form' => array(
+                            'footerTpl' => 'modules/OutboundEmailAccounts/tpls/view.obemailpanel.tpl',
+                        ),
+                        'includes' => array (
+                            array (
+                                'file' => 'cache/include/javascript/sugar_grp_yui_widgets.js'
+                            )
+                        )
                     ),
-                'panels' =>
-                    array(
-                        'default' =>
-                            array(
-                                0 =>
-                                    array(
-                                        0 => 'name',
-                                        //1 => 'assigned_user_name',
-                                    ),
-//        1 =>
-//        array (
-//          0 => 'description',
-//        ),
-                            ),
-                        'lbl_editview_panel1' =>
-                            array(
-                                
-                                array(
-                                        'name' => 'smtp_from_name',
-                                        'label' => 'LBL_SMTP_FROM_NAME',
-                                    ),
-                                
-                                array(
-                                        'name' => 'smtp_from_addr',
-                                        'label' => 'LBL_SMTP_FROM_ADDR',
-                                    ),
-                                
-                                array(
-                                    'name' => 'email_provider_chooser',
-                                    'label' => 'LBL_CHOOSE_EMAIL_PROVIDER',
-                                ),
-
-                                array(
-                                    0 =>
-                                        array(
-                                            'name' => 'mail_smtpserver',
-                                            'label' => 'LBL_SMTP_SERVERNAME',
-                                        ),
-                                    1 =>
-                                        array(
-                                            'name' => 'mail_smtpport',
-                                            'label' => 'LBL_SMTP_PORT',
-                                        ),
-                                ),
-
-                                array(
-                                    0 =>
-                                        array(
-                                            'name' => 'mail_smtpauth_req',
-                                            'label' => 'LBL_SMTP_AUTH',
-                                        ),
-                                    1 =>
-                                        array(
-                                            'name' => 'mail_smtpssl',
-                                            'studio' => 'visible',
-                                            'label' => 'LBL_SMTP_PROTOCOL',
-                                        ),
-                                ),
-
-                                array(
-                                    array(
-                                        'name' => 'mail_smtpuser',
-                                        'label' => 'LBL_USERNAME',
-                                    ),
-                                ),
-                                array(
-                                    array(
-                                        'name' => 'password_change',
-                                        'label' => 'LBL_PASSWORD',
-                                    ),
-                                ),
-                                array(
-                                    array(
-                                        'name' => 'sent_test_email_btn',
-                                        'label' => 'LBL_SEND_TEST_EMAIL',
-                                    ),
-                                ),
-                            ),
+                'panels' => array(
+                    'default' => array(
+                        0 => array(
+                            0 => 'name',
+                        ),
                     ),
+                ),
             ),
     );

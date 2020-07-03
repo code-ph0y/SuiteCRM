@@ -262,6 +262,7 @@ class EmailsDataAddressCollector
             $replyToErr = self::ERR_REPLY_TO_ADDR_NOT_FOUND;
         } else {
             $splits = explode(' ', $this->replyTo);
+
             if (count($splits) !== 2) {
                 LoggerManager::getLogger()->error('Incorrect "replay to" format found: ' . $this->replyTo);
                 $replyToErr = self::ERR_REPLY_TO_FORMAT_INVALID_SPLITS;

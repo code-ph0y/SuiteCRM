@@ -41,52 +41,29 @@ if (!defined('sugarEntry') || !sugarEntry) {
  * display the words "Powered by SugarCRM" and "Supercharged by SuiteCRM".
  */
 
+require_once 'modules/Administration/QuickRepairAndRebuild.php';
+class OutboundEmailAccountsViewDetail extends ViewDetail
+{
+    public function getMetaDataFile()
+    {
+        if ($this->bean->mail_connection_type == 'xoauth2') {
+            $this->type = 'detailxoauth2';
+        }
 
+        $metadataFile = parent::getMetaDataFile();
 
-
-
-
-require_once('modules/Emails/Email.php');
-
-global $mod_strings;
-global $app_list_strings;
-global $app_strings;
-global $current_user;
-
-$json = getJSONobj();
-$pass = '';
-if (!empty($_REQUEST['mail_smtppass'])) {
-    $pass = $_REQUEST['mail_smtppass'];
-} elseif (isset($_REQUEST['mail_type'])) {
-    $oe = new OutboundEmail();
-    if (is_admin($current_user) && $_REQUEST['mail_type'] == 'system') {
-        $oe = $oe->getSystemMailerSettings();
-    } else {
-        $oe = $oe->getMailerByName($current_user, $_REQUEST['mail_type']);
+        return $metadataFile;
     }
-    if (!empty($oe)) {
-        $pass = $oe->mail_smtppass;
+
+    public function display()
+    {    
+        $repair = new RepairAndClear();
+        $repair->repairAndClearAll(
+            array('clearThemeCache'),
+            array(translate('LBL_MYMODULE')), 
+            true,
+            false
+        );
+        parent::display();
     }
 }
-$email = BeanFactory::newBean('Emails');
-$out = $email->sendEmailTest(
-    $_REQUEST['mail_smtpserver'],
-    $_REQUEST['mail_smtpport'],
-    $_REQUEST['mail_smtpssl'],
-    ($_REQUEST['mail_smtpauth_req'] == 'true' ? 1 : 0),
-    $_REQUEST['mail_smtpuser'],
-    $pass,
-    $_REQUEST['outboundtest_from_address'],
-    $_REQUEST['outboundtest_to_address'],
-    $_REQUEST['mail_sendtype'],
-    $_REQUEST['mail_from_name'],
-    $_REQUEST['mail_connection_type'],
-    $_REQUEST['mail_xoauth2type'],
-    $_REQUEST['mail_xoauth2user'],
-    $_REQUEST['mail_xoauth2clientid'],
-    $_REQUEST['mail_xoauth2clientsecret'],
-    $_REQUEST['mail_xoauth2_token']
-);
-
-$out = $json->encode($out);
-echo $out;
